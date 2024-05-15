@@ -10,13 +10,14 @@ Description: Quality of Life Tools (qol) for social and behavioral
 License: GPL (>= 2)
 Encoding: UTF-8
 Depends:
-    R (>= 4.2.2),
+    R (>= 4.3.2),
     tidyverse
 Imports:
     lavaan,
     seminr,
     psych,
     magrittr,
+    Hmisc,
     data.table,
     VIM,
     performance,
