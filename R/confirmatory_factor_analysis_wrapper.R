@@ -169,7 +169,7 @@ cfa_wrapper = function(data = .,
       
       # Get most relevant fit metrics and create reportable table
       fit_table_sums[[group]] = comparesum$fit %>% 
-        select(chisq, df, pvalue, rmsea, rmsea.ci.lower, rmsea.ci.upper, rmsea.pvalue, cfi, tli, srmr, aic, bic) %>% 
+        dplyr::select(chisq, df, pvalue, rmsea, rmsea.ci.lower, rmsea.ci.upper, rmsea.pvalue, cfi, tli, srmr, aic, bic) %>% 
         mutate(chisq = sprintf('%.3f', chisq),
                pvalue = ifelse(pvalue < 0.001, "<.001", sprintf('%.3f', pvalue)),
                rmsea = sprintf('%.3f', rmsea),
@@ -205,7 +205,7 @@ cfa_wrapper = function(data = .,
       
       # Get relevant fit metrics into reportable table
       fitdif_table_sums[[group]] = comparesum$fit.diff %>% 
-        select(rmsea, cfi, tli, srmr, aic, bic) %>% 
+        dplyr::select(rmsea, cfi, tli, srmr, aic, bic) %>% 
         mutate(rmsea = sprintf('%.3f', rmsea),
                cfi = sprintf('%.3f', cfi),
                tli = sprintf('%.3f', tli),

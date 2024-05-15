@@ -327,7 +327,7 @@ plssem_wrapper <- function(data = .,
                              ifelse(p.value > .05, "",
                                     ifelse(p.value < .05 & p.value > .01, "*",
                                            ifelse(p.value < .01 & p.value > .001, "**", "***"))), sep = " ")) %>% 
-      select(Path, std_est)
+      dplyr::select(Path, std_est)
     
     pt_ci <- pt_outcome %>% 
       mutate(ci = paste0("(",
@@ -335,7 +335,7 @@ plssem_wrapper <- function(data = .,
                          ", ",
                          sprintf('%.3f',`97.5% CI`),
                          ")")) %>% 
-      select(Path, ci)
+      dplyr::select(Path, ci)
     
     # Get degrees of freedom for number of predictors (numerator)
     degfree1 <- length(pt_est$Path)
@@ -420,7 +420,7 @@ plssem_wrapper <- function(data = .,
                                            ifelse(p.value < .01 & p.value > .001, "**", "***"))), sep = " "),
              std_se = sprintf("%.3f",`Bootstrap SE`),
              p_val = ifelse(p.value < .001, "<.001", sprintf("%.3f", p.value))) %>% 
-      select(Path, std_est, std_se, p_val)
+      dplyr::select(Path, std_est, std_se, p_val)
     
     # Grab 95% confidence intervals
     pt_ci = pt_outcome %>% 
@@ -429,12 +429,12 @@ plssem_wrapper <- function(data = .,
                          ", ",
                          sprintf('%.3f',`97.5% CI`),
                          ")")) %>% 
-      select(Path, ci)
+      dplyr::select(Path, ci)
     
     # Clean up labels of variables
     pt_df1 = pt_est %>% 
       inner_join(pt_ci) %>% 
-      select(Path, std_est, std_se, ci, p_val) %>% 
+      dplyr::select(Path, std_est, std_se, ci, p_val) %>% 
       mutate(Path = gsub("  ->.*", "",Path))
     
     # Get basic model descriptives and metrics

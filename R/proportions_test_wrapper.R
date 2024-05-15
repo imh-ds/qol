@@ -120,7 +120,7 @@ proportion_test <- function(data = .,
         mutate(Outcome = ovar,
                Group_1 = group_pairs[[pair]][[1]],
                Group_2 = group_pairs[[pair]][[2]]) %>% 
-        select(Outcome, Group_1, Group_2, everything())
+        dplyr::select(Outcome, Group_1, Group_2, everything())
       
       # Save to list
       name <- paste0(ovar,

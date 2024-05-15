@@ -147,7 +147,7 @@ sem_wrapper = function(data = .,
                              ", ", sprintf('%.3f', ci.upper),
                              "]"),
            path = paste0(Item, " -> ", lhs)) %>%
-    select(path, lhs, op, Item, label, est.std, se, ci.lower, ci.upper, everything())
+    dplyr::select(path, lhs, op, Item, label, est.std, se, ci.lower, ci.upper, everything())
   
   # Get measurement model loadings
   loadtab <- esttab %>% 
@@ -194,7 +194,7 @@ sem_wrapper = function(data = .,
                          ifelse(pvalue > .05, "",
                                 ifelse(pvalue < .05 & pvalue > .01, "*",
                                        ifelse(pvalue < .01 & pvalue > .001, "**", "***"))), sep = " ")) %>% 
-      select(Item, est)
+      dplyr::select(Item, est)
     
     # Simplify confidence interval output
     pt_ci <- pt_outcome %>% 
@@ -204,7 +204,7 @@ sem_wrapper = function(data = .,
                          sprintf('%.3f', ci.upper),
                          ")"),
              Item = paste0(Item, "_ci")) %>% 
-      select(Item, ci)
+      dplyr::select(Item, ci)
     
     df1 <- c(rbind(pt_est$est, pt_ci$ci)) %>% 
       as.data.frame() %>% 
@@ -216,7 +216,7 @@ sem_wrapper = function(data = .,
     
     df3 <- r2tab %>% 
       filter(lhs == name) %>% 
-      select(op, est) %>% 
+      dplyr::select(op, est) %>% 
       mutate(est = sprintf("%.3f", est)) %>% 
       as.data.frame() %>% 
       rename("Variable" = op,

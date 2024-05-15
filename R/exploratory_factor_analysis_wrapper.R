@@ -45,7 +45,7 @@ efa_wrapper = function(data = .,
                        plot = FALSE){
   
   data <- data %>% 
-    select(all_of(variables))
+    dplyr::select(all_of(variables))
   
   if(is.null(factors_n)){
     
@@ -79,7 +79,7 @@ efa_wrapper = function(data = .,
     
     efa_sort <- efa_sort %>%
       inner_join(as.data.frame(dictionary)) %>% 
-      select(Item, Label, everything())
+      dplyr::select(Item, Label, everything())
     
   }
   

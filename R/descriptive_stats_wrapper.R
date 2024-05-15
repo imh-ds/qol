@@ -84,7 +84,7 @@ desc_wrapper = function(data = .,
       varname <- names(varlist)[x]
       
       data <- data %>% 
-        mutate(!!varname := rowMeans(x = select(., varlist[[x]]), na.rm = T))
+        mutate(!!varname := rowMeans(x = dplyr::select(., varlist[[x]]), na.rm = T))
       
     }
     

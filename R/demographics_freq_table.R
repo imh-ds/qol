@@ -51,7 +51,7 @@ demographic_table <- function(data = .,
                                       100*(n / total)),
                               "%"),
              Variable = var) %>% 
-      select(Variable, everything()) %>% 
+      dplyr::select(Variable, everything()) %>% 
       magrittr::set_colnames(., c("Variable",
                                   "Value",
                                   "n",
