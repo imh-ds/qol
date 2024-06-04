@@ -1,7 +1,7 @@
 Package: qol
 Type: Package
 Title: Quality of Life Automation Wrappers for Behavioral and Marketing Sciences
-Version: 0.1.0
+Version: 0.1.0.1
 Author: Hohjin Im
 Maintainer: Hohjin Im <hohjini@uci.edu>
 Description: Quality of Life Tools (qol) for behavioral and marketing 
