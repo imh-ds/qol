@@ -1,15 +1,15 @@
-#' Create correlation matrix
-#' 
-#' @description Create a correlation matrix with variable mean and standard
-#' deviation. The 'engine' of the correlation matrix is derived from Stefan
-#' Engineering's code (Stefan Engineering, 2018).
+#' Create a correlation matrix
 #'
-#' @param data A dataframe object. This should be a structured dataset where
-#'   each column represents a variable and each row represents an observation.
+#' @description Create a correlation matrix with variable mean and standard
+#'   deviation descriptive statistics. The 'engine' of the correlation matrix is
+#'   inspired from Stefan Engineering's code (Stefan Engineering, 2018).
+#'
+#' @param data A dataframe object. A structured dataset where each column
+#'   represents a variable and each row represents an observation.
 #' @param variables A required vector of column names representing their
 #'   manifest variables. For latent and composite variables that are comprised
-#'   of multiple indicators, use the desc_wrapper() function and specify a named
-#'   list of variables in the \code{varlist} argument.
+#'   of multiple indicators, use the \code{desc_wrapper()} function and specify
+#'   a named list of variables in the \code{varlist} argument.
 #' @param digits Number of decimal places for the correlation matrix. Default is
 #'   3 decimal points. If not specified, the function will use the default
 #'   value.
@@ -24,7 +24,7 @@
 #'
 #' @references Stefan Engineering (2018). Create an APA style correlation table
 #'   with R. \url{https://stefaneng.github.io/apa_correlation_table/}.
-#' 
+#'
 #' @export
 cor_matrix <- function(data = .,
                        variables,
@@ -57,35 +57,39 @@ cor_matrix <- function(data = .,
   if(isTRUE(p_stars)){
     
     # Add stars for p-value thresholds
-    stars <- ifelse(mat$P < p_thresholds[1],
-                    paste0(mat_formatted, "*"),
-                    mat_formatted)
-    stars <- ifelse(mat$P < p_thresholds[2],
-                    paste0(stars, "*"),
-                    stars)
-    stars <- ifelse(mat$P < p_thresholds[3],
-                    paste0(stars, "*"),
-                    stars)
+    cmat <- ifelse(mat$P < p_thresholds[1],
+                   paste0(mat_formatted, "*"),
+                   mat_formatted)
+    cmat <- ifelse(mat$P < p_thresholds[2],
+                   paste0(cmat, "*"),
+                   cmat)
+    cmat <- ifelse(mat$P < p_thresholds[3],
+                   paste0(cmat, "*"),
+                   cmat)
+    
+  } else {
+    
+    cmat <- mat_formatted
     
   }
 
   
   # Put - on diagonal and blank on upper diagonal
-  stars[upper.tri(stars, diag = TRUE)]  <- "-"
-  stars[upper.tri(stars, diag = FALSE)] <- ""
+  cmat[upper.tri(cmat, diag = TRUE)]  <- "-"
+  cmat[upper.tri(cmat, diag = FALSE)] <- ""
   
   # Remove _ and convert to title case
-  rownames(stars) <- tools::toTitleCase(gsub("_",
+  rownames(cmat) <- tools::toTitleCase(gsub("_",
                                              " ",
-                                             rownames(stars)))
+                                             rownames(cmat)))
   
   # Add index number to row names
-  rownames(stars) <- paste0(seq_along(rownames(stars)),
+  rownames(cmat) <- paste0(seq_along(rownames(cmat)),
                             ".",
-                            rownames(stars))
+                            rownames(cmat))
   
   # Convert to data frame
-  cortable <- as.data.frame(stars) %>% 
+  cortable <- as.data.frame(cmat) %>% 
     # Create numbered column names
     magrittr::set_colnames(., seq(ncol(.)))
   

@@ -1,2 +1,2 @@
 # qol
- Quality of Life Automation Wrappers for Social & Behavioral Sciences
+ Quality of Life Automation Wrappers for Behavioral & Marketing Sciences

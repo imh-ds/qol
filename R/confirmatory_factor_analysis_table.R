@@ -1,127 +1,227 @@
-#' MULTIPLE CONFIRMATORY FACTOR ANALYSIS WRAPPER
-#' 
-#' @description
-#' A simple wrapper to automate the running of multiple CFAs to compare fits.
-#' 
-#' @param data A dataframe object. This should be a structured dataset where
-#' each column represents a variable and each row represents an observation.
-#' @param model A list of named \code{lavaan} defined SEM objects. Refer to \code{lavaan}
-#' documentation for a description of the user-specified model.
-#' @param cluster If working with clustered/multilevel/hierarchical data, define
-#' the cluster or group variable to account for shared SE. Cluster should be
-#' a categorical factor variable.
-#' @param estimator Estimator to be used in the confirmatory factor analysis.
-#' Default is maximum likelihood (ML). Alternative esimators are limited to
-#' those offered by \code{lavaan}, e.g., "GLS", "WLS", "DWLS", "ULS", "DLS", and
-#' "PML". Refer to \code{lavaan} documentation for additional details.
-#' @param se Parameter to determine how to compute standard errors. Default
-#' is set to NULL. Set to "robust" to use either "robust.sem" or
-#' "robust.huber.white" depending on the estimator used. Refer to lavaan
-#' documentation for additional details.
-#' @param missing Parameter to determine how to handle missingness. Default
-#' is set to "listwise" where all observations with missing values are deleted
-#' prior to analysis. As detailed in \code{lavaan}'s documentation, this is only
-#' recommended when data are missing completely at random (MCAR). Another
-#' options is "ml" for full information maximum likelihood approach (fiml).
-#' Refer to lavaan documentation for additional details.
-#' 
+#' Multiple Confirmatory Factor Analysis Wrapper
+#'
+#' @description A wrapper function to automate the running of multiple
+#'   confirmatory factor analyses (CFA).
+#'
+#' @param data A data frame. Each column represents a variable and each row an
+#'   observation.
+#' @param models A list of named CFA models compatible with \code{lavaan}. See
+#'   \code{lavaan} documentation for instructions on specifying a CFA model.
+#' @param cluster An optional character argument. A variable name defining
+#'   clusters in a multi-level dataset.
+#' @param missing Method for handling missing data. Default is "listwise", which
+#'   deletes all observations with missing values prior to analysis. This is
+#'   recommended when data are missing completely at random (MCAR). Another
+#'   option is "ml" for full information maximum likelihood (FIML). See
+#'   \code{lavaan} documentation for more details.
+#' @param se Method for computing standard errors. Default is NULL. Set to
+#'   "robust" to use either "robust.sem" or "robust.huber.white" depending on
+#'   the estimator used. See \code{lavaan} documentation for more details.
+#' @param bootstrap An integer specifying the number of bootstrap iterations. A
+#'   higher value provides more robust results but increases computational time.
+#'   Default is 1000.
+#' @param estimator Estimator for the CFA. Default is maximum likelihood (ML).
+#'   Other estimators are those offered by \code{lavaan}, e.g., "GLS", "WLS",
+#'   "DWLS", "ULS", "DLS", and "PML". See \code{lavaan} documentation for more
+#'   details.
+#' @param digits An integer specifying the number of decimal places for rounding
+#'   in the in-text reference generator.
+#' @param standardized A logical value indicating whether to return standardized
+#'   or unstandardized estimates. If \code{TRUE}, the function returns
+#'   standardized estimates. If \code{FALSE}, it returns unstandardized
+#'   estimates. Default is \code{TRUE}.
+#' @param mi_groups A vector of column names representing the categorical group
+#'   variables for testing measurement invariance. Default is NULL which means
+#'   measurement invariance is not run. If specified, the function will run
+#'   measurement invariance on the groups and return fit metrics.
+#'
+#' @return A list containing \code{lavaan} CFA models and data frames with the
+#'   results of the analysis. The basic output includes data frame tables for
+#'   goodness of fit metrics and model estimations. If measurement invariance
+#'   groups were specified, fit indices and goodness of fit comparison tables
+#'   are also included in the output.
+#'
 #' @examples
 #' # Note: Model example courtesy of 'lavaan'
-#' 
+#'
 #' model1 <- '
 #'   # measurement model
 #'     ind60 =~ x1 + x2 + x3
 #'     dem60 =~ y1 + y2 + y3 + y4
 #'     dem65 =~ y5 + y6 + y7 + y8
 #'  '
-#'  
+#'
 #' model2 <- '
 #'   # measurement model
 #'     ind60 =~ x1 + x2
 #'     dem60 =~ y1 + y2
 #'     dem65 =~ y5 + y6
 #'  '
-#' 
+#'
 #' model_list <- list(First_Model = model1,
 #'                    Second_Model = model2)
-#' 
+#'
 #' cfa_table(data = data,
 #'           models = model_list)
-#' 
-#' 
-#' @references
-#' Yves Rosseel (2012). lavaan: An R Package for Structural Equation
+#'
+#'
+#' @references Yves Rosseel (2012). lavaan: An R Package for Structural Equation
 #' Modeling. \emph{Journal of Statistical Software}, 48(2), 1-36.
 #' https://doi.org/10.18637/jss.v048.i02
-#' 
+#'
 #' @export
-cfa_table = function(data = .,
-                     models,
-                     cluster = NULL,
-                     missing = "listwise",
-                     se = NULL,
-                     estimator = "ML"){
+cfa_table <- function(data = .,
+                      models,
+                      cluster = NULL,
+                      missing = "listwise",
+                      se = NULL,
+                      bootstrap = 1000,
+                      estimator = "ML",
+                      digits = 3,
+                      standardized = TRUE,
+                      mi_groups = NULL){
   
-  # Require packages
-  library(lavaan)
-  library(semTools)
+  # Repeat for every model
+  results <- lapply(seq_along(models), 
+                    function(m) {
+    
+    # Grab Model
+    mod <- models[[m]]
+    
+    # Get Model Name
+    mod_name <- names(models)[[m]]
+    
+    # Run CFA Wrapper by model
+    cfa_result <- cfa_wrapper(
+      
+      data = data,
+      model = mod,
+      name = mod_name,
+      cluster = cluster,
+      missing = missing,
+      se = se,
+      bootstrap = bootstrap,
+      estimator = estimator,
+      digits = digits,
+      standardized = standardized,
+      mi_groups = mi_groups
+      
+    )
+    
+    # Add Model names to MI results
+    cfa_result[["mi_nested"]] <- cfa_result[["mi_nested"]] %>% 
+      dplyr::mutate(model = c(mod_name,
+                              rep(NA, nrow(.)-1))) %>% 
+      dplyr::select(model, dplyr::everything())
+    
+    cfa_result[["mi_fit"]] <- cfa_result[["mi_fit"]] %>% 
+      dplyr::mutate(model = c(mod_name,
+                              rep(NA, nrow(.)-1))) %>% 
+      dplyr::select(model, dplyr::everything())
+    
+    cfa_result[["mi_fit_total"]] <- cfa_result[["mi_fit_total"]] %>% 
+      dplyr::mutate(model = c(mod_name,
+                              rep(NA, nrow(.)-1))) %>% 
+      dplyr::select(model, dplyr::everything())
+    
+    cfa_result[["mi_fitdif"]] <- cfa_result[["mi_fitdif"]] %>% 
+      dplyr::mutate(model = c(mod_name,
+                              rep(NA, nrow(.)-1))) %>% 
+      dplyr::select(model, dplyr::everything())
+    
+    cfa_result[["mi_fitdif_total"]] <- cfa_result[["mi_fitdif_total"]] %>% 
+      dplyr::mutate(model = c(mod_name,
+                              rep(NA, nrow(.)-1))) %>% 
+      dplyr::select(model, dplyr::everything())
+    
+    
+    # Return
+    return(cfa_result)
+    
+  })
   
-  # Create empty lists
-  cfa_est_list = list()
-  cfa_fit_list = list()
-  cfa_fit_table = list()
-  mod_name_list = names(models)
-  mod_reference = models
+  # Extract the results
+  cfa_models        <- lapply(results, function(x) x[["model"]])
+  cfa_fit_table     <- lapply(results, function(x) x[["fit_table"]])
+  cfa_fit_list      <- lapply(results, function(x) x[["fit_table_full"]])
+  cfa_est_full_list <- lapply(results, function(x) x[["loadings"]])
+  cfa_est_list      <- lapply(results, function(x) x[["estimates"]])
   
-  for(mod in models){
-    cfa_model = cfa(mod,
-                    data = data,
-                    missing = missing,
-                    cluster = cluster,
-                    se = se,
-                    estimator = estimator)
+  if(!is.null(mi_groups)){
     
-    mod_order = which(mod_reference == mod) %>% as.numeric()
-    mod_name = mod_name_list[mod_order]
-    
-    names = rownames(fitmeasures(cfa_model) %>% as.data.frame())
-    fittab = fitmeasures(cfa_model) %>% as.data.frame() %>% data.table::transpose()
-    colnames(fittab) = names
-    fit_table = fittab %>% 
-      mutate(Text = paste0("(chi-sq(", df,
-                           ") = ", sprintf('%.3f',chisq),
-                           ", CFI = ", sprintf('%.3f',cfi),
-                           ", TLI = ", sprintf('%.3f',tli),
-                           ", SRMR = ", sprintf('%.3f',srmr),
-                           ", RSMEA = ", sprintf('%.3f',rmsea),
-                           ", 90% CI [", sprintf('%.3f',rmsea.ci.lower),
-                           ", ", sprintf('%.3f',rmsea.ci.upper),
-                           "])")) %>% 
-      dplyr::select(Text, everything())
-    
-    cfa_fit_table[[mod_name]] = matrix(NA, nrow = 1, ncol = 10)
-    colnames(cfa_fit_table[[mod_name]]) = c("MODEL", "X2", "df", "CFI", "TLI",
-                                            "RMSEA", "LOWER", "UPPER", "SRMR", "ECVI")
-    cfa_fit_table[[mod_name]][1, ] = c(paste(mod_name), 
-                                       sprintf('%.3f',
-                                               fitmeasures(cfa_model,
-                                                           c("chisq", "df", "cfi", "tli", "rmsea",
-                                                             "rmsea.ci.lower", "rmsea.ci.upper",
-                                                             "srmr", "ecvi"))))
-    
-    cfa_fit_list[[paste0(mod_name,"_fit")]] = fit_table %>% as.data.frame()
-    cfa_est_list[[paste0(mod_name,"_est")]] = as.data.frame(standardizedsolution(cfa_model)) %>% rename(Item = rhs)
+    mi_nested       <- lapply(results, function(x) x[["mi_nested"]])
+    mi_fit_table    <- lapply(results, function(x) x[["mi_fit"]])
+    mi_fit_list     <- lapply(results, function(x) x[["mi_fit_total"]])
+    mi_fitdif_table <- lapply(results, function(x) x[["mi_fitdif"]])
+    mi_fitdif_list  <- lapply(results, function(x) x[["mi_fitdif_total"]])
     
   }
   
-  fit_tables = cfa_fit_table %>% purrr::reduce(rbind) %>% as.data.frame()
-  fit_lists = cfa_fit_list %>% purrr::reduce(rbind) %>% as.data.frame() %>% 
-    rownames_to_column(var = "Model") %>% 
-    mutate(Model = names(models))
+  # Reduce results
+  fit_tables <- purrr::reduce(cfa_fit_table, rbind)
   
-  table_full = c("Fit_Table" = list(fit_tables),
-                 "Fit_List" = list(fit_lists),
-                 cfa_est_list)
+  fit_lists  <- suppressMessages(purrr::reduce(cfa_fit_list,
+                                               inner_join))
   
-  return(table_full)
+  est_tables <- purrr::reduce(cfa_est_list, rbind) %>% 
+    dplyr::select(-op)
+  
+  if(!is.null(mi_groups)){
+    
+    grp_nested_table <- purrr::reduce(mi_nested,
+                                      rbind)
+    grp_fit_table    <- purrr::reduce(mi_fit,
+                                      rbind)
+    grp_fit_list     <- purrr::reduce(mi_fit_total,
+                                      rbind)
+    grp_fitdif_table <- purrr::reduce(mi_fitdif,
+                                      rbind)
+    grp_fitdif_list  <- purrr::reduce(mi_fitdif_list,
+                                      rbind)
+    
+  }
+  
+  
+  # Rename full models and estimate list
+  names(cfa_models) <- names(models)
+  names(cfa_est_full_list) <- paste0(names(models),
+                                     "_est")
+  
+  
+  # Compile into exportable list
+  if(!is.null(mi_groups)){
+    
+    export <- c(
+      
+      "Models" = list(cfa_models),
+      "Fit_Table" = list(fit_tables),
+      "Fit_List"  = list(fit_lists),
+      "Est_Table" = list(est_tables),
+      "MI_Nested" = list(grp_nested_table),
+      "MI_Fit_Table" = list(grp_fit_table),
+      "MI_Fit_List" = list(grp_fit_list),
+      "MI_FitDif_Table" = list(grp_fitdif_table),
+      "MI_FitDif_List" = list(grp_fitdif_list),
+      cfa_est_full_list
+      
+    )
+    
+  } else {
+    
+    export <- c(
+      
+      "Models" = list(cfa_models),
+      "Fit_Table" = list(fit_tables),
+      "Fit_List"  = list(fit_lists),
+      "Est_Table" = list(est_tables),
+      cfa_est_full_list
+      
+    )
+    
+  }
+
+  
+  # Return
+  return(export)
+  
 }

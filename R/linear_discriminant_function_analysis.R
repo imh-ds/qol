@@ -40,7 +40,7 @@ ldfa <- function(data,
   # Create formula
   formula <- as.formula(paste0(outcome,
                                " ~ ",
-                               paste0(names(iris)[1:4],
+                               paste0(inputs,
                                       collapse = " + ")))
   
   
@@ -120,13 +120,13 @@ ldfa <- function(data,
   
   
   # Add the classification function coefficients to the lda object
-  lda_result$class_functions <- class_functions
+  lda_result[["class_functions"]] <- class_functions
   
   # Get predicted memberships
-  predictions <- predict(lda_result)
+  predictions <- stats::predict(lda_result)
   
   # Store predicted classes
-  lda_result$predictions <- predictions$class
+  lda_result[["predictions"]] <- predictions[["class"]]
   
   # Return the lda object with the added classification function coefficients
   return(lda_result)

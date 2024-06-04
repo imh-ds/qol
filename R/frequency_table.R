@@ -21,7 +21,7 @@ freq <- function(data = .,
     
     # Get frequency count
     frequency <- data %>% 
-      dplyr::group_by(!!sym(variables)) %>% 
+      dplyr::group_by(!!rlang::sym(variables)) %>% 
       dplyr::count()
     
   }
@@ -35,7 +35,7 @@ freq <- function(data = .,
       
       # Get frequency count
       fr <- data %>% 
-        dplyr::group_by(!!sym(i)) %>% 
+        dplyr::group_by(!!rlang::sym(i)) %>% 
         dplyr::count()
       
       # Save to list
