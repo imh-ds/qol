@@ -46,9 +46,9 @@ higher value provides more robust results but increases computational time.
 Default is 1000.}
 
 \item{estimator}{Estimator for the CFA. Default is maximum likelihood (ML).
-Other estimators are those offered by \code{lavaan}, e.g., "GLS", "WLS",
-"DWLS", "ULS", "DLS", and "PML". See \code{lavaan} documentation for more
-details.}
+Other estimators are those offered by \code{lavaan}, e.g., \code{"GLS"},
+\code{"WLS"}, \code{"DWLS"}, \code{"ULS"}, \code{"DLS"}, and \code{"PML"}.
+See \code{lavaan} documentation for more details.}
 
 \item{digits}{An integer specifying the number of decimal places for rounding
 in the in-text reference generator.}
@@ -59,9 +59,9 @@ standardized estimates. If \code{FALSE}, it returns unstandardized
 estimates. Default is \code{TRUE}.}
 
 \item{mi_groups}{A vector of column names representing the categorical group
-variables for testing measurement invariance. Default is NULL which means
-measurement invariance is not run. If specified, the function will run
-measurement invariance on the groups and return fit metrics.}
+variables for testing measurement invariance. Default is \code{NULL} which
+means measurement invariance is not run. If specified, the function will
+run measurement invariance on the groups and return fit metrics.}
 }
 \value{
 A list containing a \code{lavaan} CFA model and data frames with the

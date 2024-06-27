@@ -6,10 +6,10 @@
 #'
 #' @param data A dataframe object. A structured dataset where each column
 #'   represents a variable and each row represents an observation.
-#' @param variables A required vector of column names representing their
-#'   manifest variables. For latent and composite variables that are comprised
-#'   of multiple indicators, use the \code{desc_wrapper()} function and specify
-#'   a named list of variables in the \code{varlist} argument.
+#' @param vars A required vector of column names representing their manifest
+#'   variables. For latent and composite variables that are comprised of
+#'   multiple indicators, use the \code{desc_wrapper()} function and specify a
+#'   named list of variables in the \code{varlist} argument.
 #' @param digits Number of decimal places for the correlation matrix. Default is
 #'   3 decimal points. If not specified, the function will use the default
 #'   value.
@@ -26,17 +26,29 @@
 #'   with R. \url{https://stefaneng.github.io/apa_correlation_table/}.
 #'
 #' @export
-cor_matrix <- function(data = .,
-                       variables,
-                       digits = 3,
-                       type = "pearson",
-                       p_thresholds = c(0.05, 0.01, 0.001),
-                       p_stars = TRUE,
-                       msd_position = "left"){
+cor_matrix <- function(
+    
+  data = .,
+  vars = NULL,
+  digits = 3,
+  type = "pearson",
+  p_thresholds = c(0.05, 0.01, 0.001),
+  p_stars = TRUE,
+  msd_position = "left"
   
-  # Get relevant variables
-  df <- data %>% 
-    dplyr::select(dplyr::all_of(variables))
+){
+  
+  # If vars is specified
+  if (!is.null(vars)) {
+    
+    df <- data %>% 
+      dplyr::select(dplyr::all_of(vars))
+    
+  } else {
+    
+    df <- data
+    
+  }
   
   # Create rcorr matrix
   mat <- df %>% 
@@ -46,7 +58,7 @@ cor_matrix <- function(data = .,
     Hmisc::rcorr(., type = type)
   
   # Round the matrix
-  mat_rounded <- round(mat$r,
+  mat_rounded <- round(mat[["r"]],
                        digits)
   
   # Format the matrix to designated decimal points
@@ -72,7 +84,7 @@ cor_matrix <- function(data = .,
     cmat <- mat_formatted
     
   }
-
+  
   
   # Put - on diagonal and blank on upper diagonal
   cmat[upper.tri(cmat, diag = TRUE)]  <- "-"
@@ -80,13 +92,13 @@ cor_matrix <- function(data = .,
   
   # Remove _ and convert to title case
   rownames(cmat) <- tools::toTitleCase(gsub("_",
-                                             " ",
-                                             rownames(cmat)))
+                                            " ",
+                                            rownames(cmat)))
   
   # Add index number to row names
   rownames(cmat) <- paste0(seq_along(rownames(cmat)),
-                            ".",
-                            rownames(cmat))
+                           ".",
+                           rownames(cmat))
   
   # Convert to data frame
   cortable <- as.data.frame(cmat) %>% 

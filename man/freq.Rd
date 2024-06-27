@@ -4,19 +4,21 @@
 \alias{freq}
 \title{Frequency Table}
 \usage{
-freq(data = ., variables)
+freq(data = ., vars)
 }
 \arguments{
 \item{data}{A dataframe object. This should be a structured dataset where
 each column represents a variable and each row represents an observation.}
 
-\item{variable}{A required single string denoting the name of the variable.}
+\item{vars}{A vector of character strings representing the names of variables
+to create frequency tables of.}
 }
 \value{
 A frequency table of the variable's unique values.
 }
 \description{
-A quick function to get a frequency table of a variable's values.
+A quick function to get a frequency table of a variable's
+  values.
 }
 \examples{
 freq(data, "education")

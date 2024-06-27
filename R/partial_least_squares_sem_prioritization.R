@@ -1,4 +1,4 @@
-#' Partial Least Squares Structural Equation Modeling Wrapper
+#' Partial Least Squares Structural Equation Modeling Prioritization
 #'
 #' @param loadings 
 #' @param weights 
@@ -12,7 +12,7 @@
 #' @export
 #'
 #' @examples
-plssem_optimizer <- function(
+plssem_prioritization <- function(
     loadings = NULL,
     weights = NULL,
     data,
@@ -298,7 +298,7 @@ plssem_optimizer <- function(
   
   
   
-  # -- CALCULATE PLS-SEM OPTIMIZATION SCORES -- #
+  # -- CALCULATE PLS-SEM PRIORITIZATION SCORES -- #
   
   ind_scores_list <- lapply(
     
@@ -353,7 +353,7 @@ plssem_optimizer <- function(
                       base::rbind)
   
   # Calculate optimization
-  optimization_list <- lapply(
+  prioritization_list <- lapply(
     
     base::unique(wd[["outcome"]]),
     function(o) {
@@ -362,14 +362,14 @@ plssem_optimizer <- function(
       wd_odf <- wd %>% 
         dplyr::filter(outcome == o)
       
-      # Calculate optimization score
-      optimization <- wd_odf %>% 
+      # Calculate prioritization score
+      prioritization <- wd_odf %>% 
         
-        # Calculate optimization scores and index
-        dplyr::mutate(optimization = loading * total_est * halo,
-                      !!sym(o) := optimization / base::mean(optimization)) %>% 
+        # Calculate prioritization scores and index
+        dplyr::mutate(prioritization = loading * total_est * halo,
+                      !!sym(o) := prioritization / base::mean(prioritization)) %>% 
         
-        # Select indicator and optimization index
+        # Select indicator and prioritization index
         dplyr::select(indicator,
                       all_of(o)) %>% 
         
@@ -377,19 +377,19 @@ plssem_optimizer <- function(
         dplyr::arrange(dplyr::desc(!!sym(o)))
       
       # Return
-      return(optimization)
+      return(prioritization)
       
     }
     
   )
   
   # Merge back
-  optimization <- base::suppressMessages(
-    purrr::reduce(optimization_list,
+  prioritization <- base::suppressMessages(
+    purrr::reduce(prioritization_list,
                   dplyr::inner_join)
   )
   
-  # Return optimization by index
-  return(optimization)
+  # Return prioritization by index
+  return(prioritization)
   
 }

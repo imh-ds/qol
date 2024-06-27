@@ -56,7 +56,7 @@ crosstab <- function(data = .,
   # Replace NA values in the second column with "<NA>"
   ct[[y]][is.na(ct[[y]])] <- "<NA>"
   
-  # Return crosstab
+  # Return
   return(ct)
   
 }

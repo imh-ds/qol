@@ -43,23 +43,15 @@ affix_plssem_pathways <- function(
   }
   
   # Grab data frames
-  model_z <- rename_mod(plssem_mod[["Paths_z"]])[[1]]
-  model_z_txt <- rename_mod(plssem_mod[["Paths_z"]])[[2]]
-  model_t <- rename_mod(plssem_mod[["Paths_t"]])[[1]]
-  model_t_txt <- rename_mod(plssem_mod[["Paths_t"]])[[2]]
+  model <- rename_mod(plssem_mod[["Pathway_Table"]])[[1]]
+  model_txt <- rename_mod(plssem_mod[["Pathway_Table"]])[[2]]
   
   # Define rows and columns
-  mod_z_row <- nrow(model_z)
-  mod_z_col <- ncol(model_z)
+  mod_row <- nrow(model)
+  mod_col <- ncol(model)
   
-  mod_zt_row <- nrow(model_z_txt)
-  mod_zt_col <- ncol(model_z_txt)
-  
-  mod_t_row <- nrow(model_t)
-  mod_t_col <- ncol(model_t)
-  
-  mod_tt_row <- nrow(model_t_txt)
-  mod_tt_col <- ncol(model_t_txt)
+  mod_t_row <- nrow(model_txt)
+  mod_t_col <- ncol(model_txt)
   
   
   # Add model performance worksheet
@@ -77,7 +69,7 @@ affix_plssem_pathways <- function(
   
   openxlsx::writeData(wb,
                       sheet = sheet_name,
-                      x = "Pathway z-Stat Table",
+                      x = "Pathway Table",
                       startCol = start_col,
                       startRow = start_row)
   openxlsx::mergeCells(wb,
@@ -91,15 +83,20 @@ affix_plssem_pathways <- function(
                       startRow = start_row+1)
   openxlsx::writeData(wb,
                       sheet = sheet_name,
-                      x = model_z,
+                      x = model,
                       startCol = start_col,
                       startRow = start_row+2)
+  openxlsx::writeData(wb,
+                      sheet = "NOTE: All coefficients and metrics are bootstrapped.",
+                      x = model,
+                      startCol = start_col,
+                      startRow = start_row + 2 + mod_row + 1)
   
   # Apply formatter
   wb <- apply_path_formatter(
     wb = wb,
     sheet = sheet_name,
-    df = model_z,
+    df = model,
     start_col = start_col,
     start_row = start_row,
     digits = digits
@@ -108,78 +105,25 @@ affix_plssem_pathways <- function(
   
   openxlsx::writeData(wb,
                       sheet = sheet_name,
-                      x = "Pathway z-Stat Text",
-                      startCol = (start_col + 1 + mod_z_col),
+                      x = "Pathway Text",
+                      startCol = (start_col + 1 + mod_col),
                       startRow = start_row)
   openxlsx::writeData(wb,
                       sheet = sheet_name,
-                      x = model_z_txt,
-                      startCol = (start_col + 1 + mod_z_col),
+                      x = model_txt,
+                      startCol = (start_col + 1 + mod_col),
                       startRow = (start_row + 2))
   
   # Apply formatter
   wb <- apply_text_formatter(
     wb = wb,
     sheet = sheet_name,
-    df = model_z_txt,
-    start_col = (start_col + 1 + mod_z_col),
+    df = model_txt,
+    start_col = (start_col + 1 + mod_col),
     start_row = start_row,
     digits = digits
   )
   
-  
-  # -- WRITE T-STAT PATHWAY TABLE -- #
-  
-  openxlsx::writeData(wb,
-                      sheet = sheet_name,
-                      x = "Pathway t-Stat Table",
-                      startCol = start_col,
-                      startRow = (start_row + 5 + mod_z_row))
-  openxlsx::mergeCells(wb,
-                       sheet = sheet_name,
-                       cols = 6:7,
-                       rows = (start_row + 6 + mod_z_row))
-  openxlsx::writeData(wb,
-                      sheet = sheet_name,
-                      x = "95% CI",
-                      startCol = 6,
-                      startRow = (start_row + 6 + mod_z_row))
-  openxlsx::writeData(wb,
-                      sheet = sheet_name,
-                      x = model_t,
-                      startCol = start_col,
-                      startRow = (start_row + 7 + mod_z_row))
-  
-  # Apply formatter
-  wb <- apply_path_formatter(
-    wb = wb,
-    sheet = sheet_name,
-    df = model_t,
-    start_col = start_col,
-    start_row = (start_row + 5 + mod_z_row),
-    digits = digits
-  )
-  
-  openxlsx::writeData(wb,
-                      sheet = sheet_name,
-                      x = "Pathway t-Stat Text",
-                      startCol = (start_col + 1 + mod_z_col),
-                      startRow = (start_row + 5 + mod_z_row))
-  openxlsx::writeData(wb,
-                      sheet = sheet_name,
-                      x = model_z_txt,
-                      startCol = (start_col + 1 + mod_z_col),
-                      startRow = (start_row + 6 + mod_z_row + 1))
-  
-  # Apply formatter
-  wb <- apply_text_formatter(
-    wb = wb,
-    sheet = sheet_name,
-    df = model_t_txt,
-    start_col = (start_col + 1 + mod_z_col),
-    start_row = (start_row + 5 + mod_z_row),
-    digits = digits
-  )
   
   
   # Expand column width of col B

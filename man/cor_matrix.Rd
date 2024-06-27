@@ -6,7 +6,7 @@
 \usage{
 cor_matrix(
   data = .,
-  variables,
+  vars = NULL,
   digits = 3,
   type = "pearson",
   p_thresholds = c(0.05, 0.01, 0.001),
@@ -18,10 +18,10 @@ cor_matrix(
 \item{data}{A dataframe object. A structured dataset where each column
 represents a variable and each row represents an observation.}
 
-\item{variables}{A required vector of column names representing their
-manifest variables. For latent and composite variables that are comprised
-of multiple indicators, use the \code{desc_wrapper()} function and specify
-a named list of variables in the \code{varlist} argument.}
+\item{vars}{A required vector of column names representing their manifest
+variables. For latent and composite variables that are comprised of
+multiple indicators, use the \code{desc_wrapper()} function and specify a
+named list of variables in the \code{varlist} argument.}
 
 \item{digits}{Number of decimal places for the correlation matrix. Default is
 3 decimal points. If not specified, the function will use the default

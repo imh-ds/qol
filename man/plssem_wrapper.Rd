@@ -15,18 +15,18 @@ plssem_wrapper(
   max_iter = 300,
   stop_criterion = 7,
   digits = 3,
-  optimizer = FALSE,
-  optimizer_type = "combo",
-  optimizer_weight_type = "combo",
-  optimizer_cor_method = "pearson"
+  prioritization = FALSE,
+  prioritization_type = "combo",
+  prioritization_weight_type = "combo",
+  prioritization_cor_method = "pearson"
 )
 }
 \arguments{
 \item{data}{A dataframe object. This should be a structured dataset where
 each column represents a variable and each row represents an observation.}
 
-\item{measurements}{Measurement model object from \code{seminr} package. Refer
-to the \code{seminr} help documentation for more details.}
+\item{measurements}{Measurement model object from \code{seminr} package.
+Refer to the \code{seminr} help documentation for more details.}
 
 \item{structure}{Structural model object from \code{seminr} package.}
 
@@ -36,12 +36,12 @@ structural pathways. Default to 1000.}
 \item{file}{Location to save output file as excel workbook if specified.}
 }
 \description{
-A wrapper function to automate PLS-SEM and extracting its results. The
-current function is limited to only 2 serial mediators. Due to the undue
-level of complexity added to the model estimations when there are 3 or
-more serial mediators, the current function is not designed to handle this
-type of model. This automation function uses the \code{seminr} package (Ray et
-al., 2022).
+A wrapper function to automate PLS-SEM and extracting its
+  results. The current function is limited to only 2 serial mediators. Due to
+  the undue level of complexity added to the model estimations when there are
+  3 or more serial mediators, the current function is not designed to handle
+  this type of model. This automation function uses the \code{seminr} package
+  (Ray et al., 2022).
 }
 \examples{
 measurements <- constructs(

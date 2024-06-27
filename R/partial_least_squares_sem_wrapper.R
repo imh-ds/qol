@@ -1,21 +1,20 @@
 #' Partial Least Squares Structural Equation Modeling Wrapper
 #' 
-#' @description
-#' A wrapper function to automate PLS-SEM and extracting its results. The
-#' current function is limited to only 2 serial mediators. Due to the undue
-#' level of complexity added to the model estimations when there are 3 or
-#' more serial mediators, the current function is not designed to handle this
-#' type of model. This automation function uses the \code{seminr} package (Ray et
-#' al., 2022).
+#' @description A wrapper function to automate PLS-SEM and extracting its
+#'   results. The current function is limited to only 2 serial mediators. Due to
+#'   the undue level of complexity added to the model estimations when there are
+#'   3 or more serial mediators, the current function is not designed to handle
+#'   this type of model. This automation function uses the \code{seminr} package
+#'   (Ray et al., 2022).
 #' 
 #' @param data A dataframe object. This should be a structured dataset where
-#' each column represents a variable and each row represents an observation.
-#' @param measurements Measurement model object from \code{seminr} package. Refer
-#' to the \code{seminr} help documentation for more details.
+#'   each column represents a variable and each row represents an observation.
+#' @param measurements Measurement model object from \code{seminr} package.
+#'   Refer to the \code{seminr} help documentation for more details.
 #' @param structure Structural model object from \code{seminr} package.
 #' @param file Location to save output file as excel workbook if specified.
 #' @param bootn Number of bootstrap replications to calculate p-values at the
-#' structural pathways. Default to 1000.
+#'   structural pathways. Default to 1000.
 #' 
 #' @examples
 #' measurements <- constructs(
@@ -56,10 +55,11 @@ plssem_wrapper <- function(
     max_iter = 300,
     stop_criterion = 7,
     digits = 3,
-    optimizer = FALSE,
-    optimizer_type = "combo",
-    optimizer_weight_type = "combo",
-    optimizer_cor_method = "pearson") {
+    prioritization = FALSE,
+    prioritization_type = "combo",
+    prioritization_weight_type = "combo",
+    prioritization_cor_method = "pearson"
+) {
   
 
   # EXTRACT STRUCTURE VARIABLES ---------------------------------------------
@@ -714,7 +714,7 @@ plssem_wrapper <- function(
   
   # Combine into final product
   reg_long_table <- rbind(reg_tab_longeff,
-                        reg_tab_longdesc) %>% 
+                          reg_tab_longdesc) %>% 
     dplyr::mutate(variable = ifelse(grepl("_CI", variable), "", variable)) %>% 
     dplyr::mutate(variable = gsub("\\*", " \u00D7 ", variable)) %>% 
     magrittr::set_colnames(.,
@@ -995,62 +995,62 @@ plssem_wrapper <- function(
   # -- PLS-SEM OPTIMIZER -- #
   
   # Run if optimizer is set to TRUE
-  if (base::isTRUE(optimizer)) {
+  if (base::isTRUE(prioritization)) {
     
     # -- LOADINGS -- #
-    if (optimizer_type == "loading") {
+    if (prioritization_type == "loading") {
       
       # Calculate loadings optimizer
-      opt <- qol::plssem_optimizer(
+      prio <- qol::plssem_prioritization(
         
         loadings = modelloadings,
         data = data,
         total_estimates = modeltoteffs,
         outcomes = outcomes,
-        weight_type = optimizer_weight_type,
-        cor_method = optimizer_cor_method
+        weight_type = prioritization_weight_type,
+        cor_method = prioritization_cor_method
         
       )
       
     }
     
     # -- WEIGHTS -- #
-    if (optimizer_type == "weight") {
+    if (prioritization_type == "weight") {
       
       # Calculate weights optimizer
-      opt <- qol::plssem_optimizer(
+      prio <- qol::plssem_prioritization(
         
         weights = modelweights,
         data = data,
         total_estimates = modeltoteffs,
         outcomes = outcomes,
-        weight_type = optimizer_weight_type,
-        cor_method = optimizer_cor_method
+        weight_type = prioritization_weight_type,
+        cor_method = prioritization_cor_method
         
       )
       
     }
     
     # -- COMBINATION -- #
-    if (optimizer_type == "combo") {
+    if (prioritization_type == "combo") {
       
       # Calculate combinations optimizer
-      opt <- qol::plssem_optimizer(
+      prio <- qol::plssem_prioritization(
         
         loadings = modelloadings,
         weights = modelweights,
         data = data,
         total_estimates = modeltoteffs,
         outcomes = outcomes,
-        weight_type = optimizer_weight_type,
-        cor_method = optimizer_cor_method
+        weight_type = prioritization_weight_type,
+        cor_method = prioritization_cor_method
         
       )
       
     }
     
     # Save to results
-    pls_sheets[["Optimizer"]] <- opt
+    pls_sheets[["Prioritization"]] <- prio
     
   }
   

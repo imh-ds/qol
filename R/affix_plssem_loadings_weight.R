@@ -15,6 +15,21 @@ affix_plssem_load_wgt <- function(
     sheet_name,
     digits = 3) {
   
+  # Get Pathway Table
+  model_m <- plssem_mod[[sheet_name]] %>% 
+    dplyr::rename(
+      
+      Path = "path",
+      "\u03B2" = est,
+      "\u03B2\u1D47" = boot_est,
+      "SE\u1D47" = boot_se,
+      "Lower" = lower_ci,
+      "Upper" = upper_ci
+      
+    ) %>% 
+    dplyr::select(-t)
+  
+  
   # Get data frames
   if(sheet_name == "Loadings") {
     
@@ -22,19 +37,6 @@ affix_plssem_load_wgt <- function(
     model_t <- plssem_mod[["Loadings_Table"]] %>% 
       magrittr::set_colnames(
         ., stringr::str_to_title(base::names(.))
-      )
-    
-    # Get Loadings Pathway Table
-    model_m <- plssem_mod[["Loadings"]] %>% 
-      dplyr::rename(
-        
-        Path = "path",
-        "\u03B2" = est,
-        "\u03B2*" = boot_est,
-        "SE*" = boot_se,
-        "Lower" = lower_ci,
-        "Upper" = upper_ci
-        
       )
     
     title_table <- "Loadings Table"
@@ -48,19 +50,6 @@ affix_plssem_load_wgt <- function(
     model_t <- plssem_mod[["Weights_Table"]] %>% 
       magrittr::set_colnames(
         ., stringr::str_to_title(base::names(.))
-      )
-    
-    # Get Weights Pathway Table
-    model_m <- plssem_mod[["Weights"]] %>% 
-      dplyr::rename(
-        
-        Path = "path",
-        "\u03B2" = est,
-        "\u03B2*" = boot_est,
-        "SE*" = boot_se,
-        "Lower" = lower_ci,
-        "Upper" = upper_ci
-        
       )
     
     title_table <- "Weights Table"
@@ -134,12 +123,12 @@ affix_plssem_load_wgt <- function(
                       startRow = (start_row + 4 + mod_t_row))
   openxlsx::mergeCells(wb,
                        sheet = sheet_name,
-                       cols = 8:9,
+                       cols = 7:8,
                        rows = (start_row + 5 + mod_t_row))
   openxlsx::writeData(wb,
                       sheet = sheet_name,
                       x = "95% CI",
-                      startCol = 8,
+                      startCol = 7,
                       startRow = (start_row + 5 + mod_t_row))
   openxlsx::writeData(wb,
                       sheet = sheet_name,
@@ -148,7 +137,7 @@ affix_plssem_load_wgt <- function(
                       startRow = (start_row + 6 + mod_t_row))
   openxlsx::writeData(wb,
                       sheet = sheet_name,
-                      x = "NOTE: p-value derived from z-statistic.",
+                      x = "NOTE: \u1D47 bootstrapped values.",
                       startCol = start_col,
                       startRow = (start_row + 6 + mod_t_row + mod_m_row + 1))
   
@@ -160,7 +149,7 @@ affix_plssem_load_wgt <- function(
     df = model_m,
     start_col = start_col,
     start_row = (start_row + 4 + mod_t_row),
-    ci_col = 8:9,
+    ci_col = 7:8,
     digits = digits
     
   )

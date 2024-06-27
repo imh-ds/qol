@@ -4,7 +4,7 @@
 \alias{proportion_test}
 \title{Proportions Test Wrapper}
 \usage{
-proportion_test(data = ., group, outcomes)
+proportion_test(data = ., group, outcomes, digits = 3)
 }
 \arguments{
 \item{data}{A dataframe object. This should be a structured dataset where

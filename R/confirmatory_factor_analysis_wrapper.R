@@ -25,9 +25,9 @@
 #'   higher value provides more robust results but increases computational time.
 #'   Default is 1000.
 #' @param estimator Estimator for the CFA. Default is maximum likelihood (ML).
-#'   Other estimators are those offered by \code{lavaan}, e.g., "GLS", "WLS",
-#'   "DWLS", "ULS", "DLS", and "PML". See \code{lavaan} documentation for more
-#'   details.
+#'   Other estimators are those offered by \code{lavaan}, e.g., \code{"GLS"},
+#'   \code{"WLS"}, \code{"DWLS"}, \code{"ULS"}, \code{"DLS"}, and \code{"PML"}.
+#'   See \code{lavaan} documentation for more details.
 #' @param digits An integer specifying the number of decimal places for rounding
 #'   in the in-text reference generator.
 #' @param standardized A logical value indicating whether to return standardized
@@ -35,9 +35,9 @@
 #'   standardized estimates. If \code{FALSE}, it returns unstandardized
 #'   estimates. Default is \code{TRUE}.
 #' @param mi_groups A vector of column names representing the categorical group
-#'   variables for testing measurement invariance. Default is NULL which means
-#'   measurement invariance is not run. If specified, the function will run
-#'   measurement invariance on the groups and return fit metrics.
+#'   variables for testing measurement invariance. Default is \code{NULL} which
+#'   means measurement invariance is not run. If specified, the function will
+#'   run measurement invariance on the groups and return fit metrics.
 #'
 #' @return A list containing a \code{lavaan} CFA model and data frames with the
 #'   results of the analysis. The basic output includes data frame tables for
@@ -54,20 +54,24 @@
 #' @references Yves Rosseel (2012). lavaan: An R Package for Structural Equation
 #'   Modeling. \emph{Journal of Statistical Software}, 48(2), 1-36.
 #'   \url{https://doi.org/10.18637/jss.v048.i02}.
-#' 
+#'
 #' @export
-cfa_wrapper <- function(data = .,
-                        model,
-                        name = NULL,
-                        cluster = NULL,
-                        missing = "listwise",
-                        se = NULL,
-                        bootstrap = 1000,
-                        estimator = "ML",
-                        digits = 3,
-                        standardized = TRUE,
-                        mi_groups = NULL){
+cfa_wrapper <- function(
+    data = .,
+    model,
+    name = NULL,
+    cluster = NULL,
+    missing = "listwise",
+    se = NULL,
+    bootstrap = 1000,
+    estimator = "ML",
+    digits = 3,
+    standardized = TRUE,
+    mi_groups = NULL
+) {
   
+
+  # RUN CONFIRMATORY FACTOR ANALYSIS ----------------------------------------
   
   # Run Confirmatory Factor Analysis
   cfa_model <- lavaan::cfa(
@@ -112,6 +116,8 @@ cfa_wrapper <- function(data = .,
                 digits,
                 "f")
   
+
+  # CFA FIT INDICES ---------------------------------------------------------
   
   # Get individual fit metrics
   
@@ -181,6 +187,8 @@ cfa_wrapper <- function(data = .,
     
   )
   
+
+  # CFA LOADINGS ------------------------------------------------------------
   
   # Grab CFA standardized loadings if standardized == TRUE
   if(isTRUE(standardized)){
@@ -225,6 +233,9 @@ cfa_wrapper <- function(data = .,
                                 nrow(.)-1))) %>% 
     dplyr::select(model, dplyr::everything())
   
+  
+
+  # MEASUREMENT INVARIANCE --------------------------------------------------
   
   # If measurement invariance is specified
   if(!is.null(mi_groups)){

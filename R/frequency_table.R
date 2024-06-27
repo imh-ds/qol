@@ -1,20 +1,21 @@
 #' Frequency Table
-#' 
-#' @description
-#' A quick function to get a frequency table of a variable's values.
-#' 
+#'
+#' @description A quick function to get a frequency table of a variable's
+#'   values.
+#'
 #' @param data A dataframe object. This should be a structured dataset where
-#' each column represents a variable and each row represents an observation.
-#' @param variable A required single string denoting the name of the variable.
-#' 
+#'   each column represents a variable and each row represents an observation.
+#' @param vars A vector of character strings representing the names of variables
+#'   to create frequency tables of.
+#'
 #' @returns A frequency table of the variable's unique values.
-#' 
+#'
 #' @examples
 #' freq(data, "education")
-#' 
+#'
 #' @export
 freq <- function(data = .,
-                 variables){
+                 vars){
   
   # If only 1 variable
   if(length(variables) == 1){
@@ -45,7 +46,7 @@ freq <- function(data = .,
     
   }
   
-  
+  # Return
   return(frequency)
   
 }
