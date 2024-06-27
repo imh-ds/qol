@@ -1,10 +1,10 @@
 Package: qol
 Type: Package
-Title: Quality of Life Automation Wrappers for Behavioral and Marketing Sciences
+Title: Quality of Life Tools & Wrappers for Behavioral and Business Sciences
 Version: 0.1.0.1
 Author: Hohjin Im
 Maintainer: Hohjin Im <hohjini@uci.edu>
-Description: Quality of Life Tools (qol) for behavioral and marketing 
+Description: Quality of Life Tools (qol) for behavioral and business 
     sciences research. This package automates the running and extracting of
     common analyses.
 License: GPL (>= 2)
@@ -23,10 +23,9 @@ Imports:
     performance,
     broom,
     carData,
-    jmv,
-    jmvcore,
     tools,
-    tidyverse
+    tidyverse,
+    emmeans
 Remotes:
     github::imh-ds/cscore
 RoxygenNote: 7.3.1
