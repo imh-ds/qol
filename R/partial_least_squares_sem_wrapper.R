@@ -44,7 +44,7 @@
 #' \url{https://CRAN.R-project.org/package=seminr}.
 #' 
 #' @export
-plssem_wrapper <- function(
+wrap_plssem <- function(
     data = .,
     measurements,
     structure,
