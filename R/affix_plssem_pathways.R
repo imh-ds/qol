@@ -84,8 +84,8 @@ affix_plssem_pathways <- function(
                       startCol = start_col,
                       startRow = start_row+2)
   openxlsx::writeData(wb,
-                      sheet = "NOTE: All coefficients and metrics are bootstrapped.",
-                      x = model,
+                      sheet = sheet_name,
+                      x = "NOTE: All coefficients and metrics are bootstrapped.",
                       startCol = start_col,
                       startRow = start_row + 2 + mod_row + 1)
   
