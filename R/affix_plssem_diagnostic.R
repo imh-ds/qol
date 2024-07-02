@@ -4,10 +4,7 @@
 #' @param sheet_name 
 #' @param digits 
 #'
-#' @return
 #' @export
-#'
-#' @examples
 affix_plssem_diagnostic <- function(
     wb,
     plssem_mod,

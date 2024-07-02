@@ -5,10 +5,7 @@
 #' @param sheet_name 
 #' @param digits 
 #'
-#' @return
 #' @export
-#'
-#' @examples
 affix_plssem_load_wgt <- function(
     wb,
     plssem_mod,

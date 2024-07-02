@@ -5,30 +5,21 @@
 \title{Calculate Effect Size Cohen's d}
 \usage{
 calc_es_d(
-  g1_m,
-  g2_m,
-  g1_sd,
-  g2_sd,
-  g1_n,
-  g2_n,
+  outcome,
+  group,
   sd_pooled = NULL,
   es_type = "hedges",
   g_correction = "standard",
-  conf_level = 0.95
+  conf_level = 0.95,
+  paired = FALSE,
+  bs_unique = NULL,
+  within_vars = NULL
 )
 }
 \arguments{
-\item{g1_m}{Numeric value of group 1's mean.}
+\item{outcome}{A vector of the outcome values.}
 
-\item{g2_m}{Numeric value of group 2's mean.}
-
-\item{g1_sd}{Numeric value of group 1's standard deviation.}
-
-\item{g2_sd}{Numeric value of group 2's standard deviation.}
-
-\item{g1_n}{Numeric value of group 1's sample size n.}
-
-\item{g2_n}{Numeric value of group 2's sample size n.}
+\item{group}{A vector of the grouping values.}
 
 \item{sd_pooled}{Optional numeric value of the pooled standard deviation. If
 not specified, the pooled standard deviation is calculated from group 1 and
@@ -45,8 +36,19 @@ standard.}
 
 \item{conf_level}{Numeric value reflecting the confidence interval level. The
 default is 0.95 for 95% confidence interval.}
+
+\item{paired}{A logical reflecting whether the pairwise comparison is between
+(FALSE) or within (TRUE) subjects. If within, then the pair is tested
+whether it is truly within by iterating through the unique between subjects
+combinations. \code{bs_unique} must be specified.}
+
+\item{bs_unique}{A vector of characters indicating the unique levels of the
+between subjects variables.}
+
+\item{within_vars}{A vector of characters indicating the repeated measures
+variables.}
 }
 \description{
 Calculate the Cohen's d, Hedges' g, or Glass's delta effect size
-for independent samples t-tests.
+  for independent samples t-tests.
 }

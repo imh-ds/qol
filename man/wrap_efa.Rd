@@ -19,6 +19,11 @@ wrap_efa(
 \item{data}{A dataframe object. This should be a structured dataset where
 each column represents a variable and each row represents an observation.}
 
+\item{vars}{A required vector of column names representing their manifest
+variables.}
+
+\item{codebook}{An optional variable codebook.}
+
 \item{factors_n}{A single numeric value for the number of factors to
 identify. Default is NULL where it automatically determines the optimal
 number of factors.}
@@ -26,28 +31,24 @@ number of factors.}
 \item{rotation}{Defaults to "oblimin" for an oblique rotation. See
 \code{help(psych::fa)} for other rotation options.}
 
-\item{missing}{Defaults to NULL, and does not impute missing values. If
-set to TRUE, specify impute option.}
+\item{missing}{Defaults to NULL, and does not impute missing values. If set
+to TRUE, specify impute option.}
 
-\item{impute}{default to "none". Specify impute option "mean" or "median" to replace missing values.}
+\item{impute}{default to "none". Specify impute option "mean" or "median" to
+replace missing values.}
 
 \item{plot}{default to FALSE. If set to TRUE, returns elbow plot.}
-
-\item{variables}{A required vector of column names representing their 
-manifest variables.}
-
-\item{dictionary}{variable dictionary}
 }
 \value{
 The exploratory factor analysis output, a dataframe of the items
-sorted from highest to lowest factor loading on their respective factors,
-and a list of additional outputs.
+  sorted from highest to lowest factor loading on their respective factors,
+  and a list of additional outputs.
 }
 \description{
-Runs exploratory factor analysis (EFA) through the \code{psych} package's \code{fa()}
-function. A simple wrapper that automates a general EFA for most needs.
-For complex or custom settings, users are recommended to simply use the
-\code{psych::fa} (Revelle, 2023).
+Runs exploratory factor analysis (EFA) through the \code{psych}
+  package's \code{fa()} function. A simple wrapper that automates a general
+  EFA for most needs. For complex or custom settings, users are recommended
+  to simply use the \code{psych::fa} (Revelle, 2023).
 }
 \examples{
 variables <- c("item1", "item2", "item3", "item4")
@@ -56,7 +57,7 @@ efa_wrapper(data, variables, plot = TRUE)
 }
 \references{
 William Revelle (2023). psych: Procedures for Psychological,
-Psychometric, and Personality Research. Northwestern University, Evanston,
-Illinois. R package version 2.3.3,
-\url{https://CRAN.R-project.org/package=psych}.
+  Psychometric, and Personality Research. Northwestern University, Evanston,
+  Illinois. R package version 2.3.3,
+  \url{https://CRAN.R-project.org/package=psych}.
 }

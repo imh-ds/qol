@@ -1,38 +1,38 @@
 #' Exploratory Factor Analysis Wrapper
 #' 
-#' @description
-#' Runs exploratory factor analysis (EFA) through the \code{psych} package's \code{fa()}
-#' function. A simple wrapper that automates a general EFA for most needs.
-#' For complex or custom settings, users are recommended to simply use the
-#' \code{psych::fa} (Revelle, 2023). 
-#' 
+#' @description Runs exploratory factor analysis (EFA) through the \code{psych}
+#'   package's \code{fa()} function. A simple wrapper that automates a general
+#'   EFA for most needs. For complex or custom settings, users are recommended
+#'   to simply use the \code{psych::fa} (Revelle, 2023).
+#'
 #' @param data A dataframe object. This should be a structured dataset where
-#' each column represents a variable and each row represents an observation.
-#' @param variables A required vector of column names representing their 
-#' manifest variables.
-#' @param dictionary variable dictionary
+#'   each column represents a variable and each row represents an observation.
+#' @param vars A required vector of column names representing their manifest
+#'   variables.
+#' @param codebook An optional variable codebook.
 #' @param factors_n A single numeric value for the number of factors to
-#' identify. Default is NULL where it automatically determines the optimal
-#' number of factors.
+#'   identify. Default is NULL where it automatically determines the optimal
+#'   number of factors.
 #' @param rotation Defaults to "oblimin" for an oblique rotation. See
-#' \code{help(psych::fa)} for other rotation options.
-#' @param missing Defaults to NULL, and does not impute missing values. If
-#' set to TRUE, specify impute option.
-#' @param impute default to "none". Specify impute option "mean" or "median" to replace missing values.
+#'   \code{help(psych::fa)} for other rotation options.
+#' @param missing Defaults to NULL, and does not impute missing values. If set
+#'   to TRUE, specify impute option.
+#' @param impute default to "none". Specify impute option "mean" or "median" to
+#'   replace missing values.
 #' @param plot default to FALSE. If set to TRUE, returns elbow plot.
-#' 
+#'
 #' @return The exploratory factor analysis output, a dataframe of the items
-#' sorted from highest to lowest factor loading on their respective factors,
-#' and a list of additional outputs.
-#' 
+#'   sorted from highest to lowest factor loading on their respective factors,
+#'   and a list of additional outputs.
+#'
 #' @examples
 #' variables <- c("item1", "item2", "item3", "item4")
 #' efa_wrapper(data, variables, plot = TRUE)
-#' 
+#'
 #' @references William Revelle (2023). psych: Procedures for Psychological,
-#' Psychometric, and Personality Research. Northwestern University, Evanston,
-#' Illinois. R package version 2.3.3,
-#' \url{https://CRAN.R-project.org/package=psych}.
+#'   Psychometric, and Personality Research. Northwestern University, Evanston,
+#'   Illinois. R package version 2.3.3,
+#'   \url{https://CRAN.R-project.org/package=psych}.
 #' 
 #' @export
 wrap_efa <- function(

@@ -25,9 +25,6 @@
 #'   \code{"log"} to apply logarithmic Hedges' g correction. The default is
 #'   standard.
 #'
-#' @return
-#' 
-#' @examples
 #' 
 #' @export
 calc_ind_ttest <- function(
@@ -50,26 +47,26 @@ calc_ind_ttest <- function(
            group)
   )
   
-  # Outcome data
-  out_df <- as.numeric(data[[outcome]])
-  grp_df <- as.character(data[[group]])
-  
-  # Get group standard deviations
-  grp_sd <- tapply(out_df,
-                   grp_df,
-                   sd,
-                   na.rm = T)
-  
-  # Get group means
-  grp_m <- tapply(out_df,
-                  grp_df,
-                  mean,
-                  na.rm = T)
-  
-  # Get group n
-  grp_n <- tapply(out_df,
-                  grp_df,
-                  \(x) length(na.omit(x)))
+  # # Outcome data
+  # out_df <- as.numeric(data[[outcome]])
+  # grp_df <- as.character(data[[group]])
+  # 
+  # # Get group standard deviations
+  # grp_sd <- tapply(out_df,
+  #                  grp_df,
+  #                  sd,
+  #                  na.rm = T)
+  # 
+  # # Get group means
+  # grp_m <- tapply(out_df,
+  #                 grp_df,
+  #                 mean,
+  #                 na.rm = T)
+  # 
+  # # Get group n
+  # grp_n <- tapply(out_df,
+  #                 grp_df,
+  #                 \(x) length(na.omit(x)))
   
   
   
@@ -99,12 +96,12 @@ calc_ind_ttest <- function(
   # Get standard error
   se <- m / stat
   
-  # Get pooled SD
-  sd_pooled <- sqrt(
-    
-    (grp_sd[[1]]^2 + grp_sd[[2]]^2) / 2
-    
-  )
+  # # Get pooled SD
+  # sd_pooled <- sqrt(
+  #   
+  #   (grp_sd[[1]]^2 + grp_sd[[2]]^2) / 2
+  #   
+  # )
   
   # Get mean difference confidence interval
   m_ci <- t_test[["conf.int"]]
@@ -116,13 +113,9 @@ calc_ind_ttest <- function(
   # Calculate effect size
   es_df <- calc_es_d(
     
-    g1_m = grp_m[[1]],
-    g2_m = grp_m[[2]],
-    g1_sd = grp_sd[[1]],
-    g2_sd = grp_sd[[2]],
-    g1_n = grp_n[[1]],
-    g2_n = grp_n[[2]],
-    sd_pooled = sd_pooled,
+    outcome = data[[outcome]],
+    group = data[[group]],
+    # sd_pooled = sd_pooled,
     es_type = es_type,
     g_correction = g_correction,
     conf_level = conf_level

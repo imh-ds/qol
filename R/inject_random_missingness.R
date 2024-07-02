@@ -4,10 +4,7 @@
 #' @param data 
 #' @param prop 
 #'
-#' @return
 #' @export
-#'
-#' @examples
 inject_na <- function(data = .,
                       prop = .10) {
   

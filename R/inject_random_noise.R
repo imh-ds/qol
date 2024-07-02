@@ -5,10 +5,7 @@
 #' @param iter 
 #' @param vars 
 #'
-#' @return
 #' @export
-#'
-#' @examples
 inject_noise <- function(data = .,
                          iter = 1,
                          vars = NULL) {

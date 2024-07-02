@@ -1,4 +1,3 @@
-
 #' Independent Samples T-Test Wrapper
 #'
 #' @description A wrapper function to automate running and extracting the
@@ -31,8 +30,6 @@
 #'   \code{"log"} to apply logarithmic Hedges' g correction. The default is
 #'   standard.
 #'
-#' @return
-#' @examples
 #'
 #' @export
 wrap_ttest <- function(

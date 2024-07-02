@@ -8,10 +8,7 @@
 #' @param aug_n 
 #' @param replace 
 #'
-#' @return
 #' @export
-#'
-#' @examples
 naugment <- function(
     
   data,

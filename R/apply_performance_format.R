@@ -6,10 +6,7 @@
 #' @param start_col 
 #' @param start_row 
 #'
-#' @return
 #' @export
-#'
-#' @examples
 apply_perf_formatter <- function(
     wb,
     sheet,

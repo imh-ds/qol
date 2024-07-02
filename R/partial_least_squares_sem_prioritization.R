@@ -8,10 +8,7 @@
 #' @param weight_type 
 #' @param cor_method 
 #'
-#' @return
 #' @export
-#'
-#' @examples
 plssem_prioritization <- function(
     loadings = NULL,
     weights = NULL,

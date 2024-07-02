@@ -13,10 +13,6 @@
 #'   \code{"less"}. The default is two sided alternative hypothesis.
 #' @param conf_level Numeric value reflecting the confidence interval level. The
 #'   default is 0.95 for 95% confidence interval.
-#'
-#' @return
-#'
-#' @examples
 #' 
 #' @export
 calc_wilcox_test <- function(
