@@ -21,8 +21,8 @@ affix_plssem_pathways <- function(
                        in_text,
                        fig_text)) %>% 
       dplyr::rename(Pathway = path,
-                    "\u03B2" = boot_est,
-                    SE = boot_se,
+                    "\u03B2\u1D47" = boot_est,
+                    "SE\u1D47" = boot_se,
                     Lower = lower_ci,
                     Upper = upper_ci)
     
@@ -40,8 +40,20 @@ affix_plssem_pathways <- function(
   }
   
   # Grab data frames
-  model <- rename_mod(plssem_mod[["Pathway_Table"]])[[1]]
-  model_txt <- rename_mod(plssem_mod[["Pathway_Table"]])[[2]]
+  if (sheet_name == "Direct_Paths") {
+    
+    model <- rename_mod(plssem_mod[["Direct_Effects"]])[[1]]
+    model_txt <- rename_mod(plssem_mod[["Direct_Effects"]])[[2]]
+    
+  }
+  
+  if (sheet_name == "Indirect_Paths") {
+    
+    model <- rename_mod(plssem_mod[["Indirect_Effects"]])[[1]]
+    model_txt <- rename_mod(plssem_mod[["Indirect_Effects"]])[[2]]
+    
+  }
+
   
   # Define rows and columns
   mod_row <- nrow(model)

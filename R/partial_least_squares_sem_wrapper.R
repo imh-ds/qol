@@ -848,7 +848,7 @@ wrap_plssem <- function(
     "Validity_HTMT" = htmt_val,
     "HTMT" = modelhtmt,
     "VIF" = modelvif,
-    "Pathway_Table" = paths_tab,
+    "Direct_Effects" = paths_tab,
     "Loadings_Table" = mod_loadings,
     "Loadings" = modelloadings,
     "Weights_Table" = mod_weights,
@@ -981,7 +981,20 @@ wrap_plssem <- function(
                                             base::paste("=", 
                                                         base::sprintf(rnd, 
                                                                       p))),
-                      ")")) %>% 
+                      ")"),
+                    fig_text = paste(sprintf(rnd, boot_est),
+                                     case_when(
+                                       
+                                       p > .05 ~ "",
+                                       p < .05 & p > .01 ~ "*",
+                                       p < .01 & p > .001 ~ "**",
+                                       p < .001 ~ "***"
+                                       
+                                     ),
+                                     " [", sprintf(rnd,lower_ci),
+                                     ", ", sprintf(rnd,upper_ci),
+                                     "]",
+                                     sep = "")) %>% 
     dplyr::relocate(z,
                     .after = boot_se)
     
