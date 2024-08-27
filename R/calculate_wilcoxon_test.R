@@ -76,9 +76,31 @@ calc_wilcox_test <- function(
     
   )
   
-  c <- rbc[["r_rank_biserial"]]
+  c <- abs(rbc[["r_rank_biserial"]])
+  
   c_ci_lower <- rbc[["CI_low"]]
   c_ci_upper <- rbc[["CI_high"]]
+  
+  if ((c_ci_lower < 0 && c_ci_upper > 0) |
+      (c_ci_lower > 0 && c_ci_upper < 0)) {
+    
+    c_lower <- c_ci_upper * -1
+    c_upper <- c_ci_lower * -1
+    
+  } else {
+    
+    c_lower <- c_ci_lower
+    c_upper <- c_ci_upper
+    
+  }
+
+  if (c_ci_lower < 0 && c_ci_upper < 0) {
+    
+    c_lower <- abs(c_ci_upper)
+    c_upper <- abs(c_ci_lower)
+    
+  }
+  
   
   # Calculate rank-biserial SE
   n <- length(data[[outcome]])
@@ -87,7 +109,7 @@ calc_wilcox_test <- function(
   # Compile into t-test data frame
   mw_df <- data.frame(
     
-    test = "Wilcoxon Rank-Sum",
+    test = "Wilcoxon Rank-Sum W",
     stat = stat,
     df = df,
     p = mw_test[["p.value"]],
@@ -98,10 +120,23 @@ calc_wilcox_test <- function(
     es_type = "Rank Biserial Correlation",
     es = c,
     es_se = se_rbc,
-    es_ci_lower = c_ci_lower,
-    es_ci_upper = c_ci_upper
+    es_ci_lower = c_lower,
+    es_ci_upper = c_upper
     
-  )
+  ) %>% 
+    
+    # Reorder
+    dplyr::select(
+      test,
+      m_dif,
+      se_dif,
+      m_ci_lower,
+      m_ci_upper,
+      df,
+      stat,
+      p,
+      dplyr::everything()
+    )
   
   # Return
   return(mw_df)

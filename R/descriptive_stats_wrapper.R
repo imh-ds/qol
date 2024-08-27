@@ -93,7 +93,7 @@ desc_wrapper <- function(
     cor_mat <- cor_matrix(
       
       data = cs_df,
-      variables = cs_od,
+      vars = cs_od,
       digits = digits,
       type = type,
       p_thresholds = p_thresholds,

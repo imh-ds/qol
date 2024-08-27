@@ -6,22 +6,27 @@
 #' @param vars 
 #'
 #' @export
-inject_noise <- function(data = .,
-                         iter = 1,
-                         vars = NULL) {
+inject_noise <- function(
+    data = .,
+    iter = 1,
+    vars = NULL,
+    noise_value = 1,
+    digits = NA
+) {
   
-  
-  if (is.null(vars)) {
+  # If no variables are specified, then get all variables in dataframe
+  names <- if (is.null(vars)) {
     
-    names <- names(data)
+    names(data)
     
   } else {
     
-    names <- vars
+    vars
     
   }
   
   
+  # Iterate noise injection n times
   for (n in iter) {
     
     # Loop over each column in the dataframe
@@ -42,20 +47,48 @@ inject_noise <- function(data = .,
             next
           }
           
-          # If the value is the minimum, randomly add 0 or 1
-          else if (data[i, col_name] == min_val) {
-            data[i, col_name] <- data[i, col_name] + sample(0:1, 1)
-          }
+          # # If the value is the minimum, randomly add 0 or 1
+          # else if (data[i, col_name] == min_val) {
+          #   data[i, col_name] <- data[i, col_name] + sample(0:noise_value, 1)
+          # }
+          # 
+          # # If the value is the maximum, randomly add -1 or 0
+          # else if (data[i, col_name] == max_val) {
+          #   data[i, col_name] <- data[i, col_name] + sample(-noise_value:0, 1)
+          # }
+          # 
+          # # Otherwise, randomly add -1, 0, or 1
+          # else {
+          #   data[i, col_name] <- data[i, col_name] + sample(-noise_value:noise_value, 1)
+          # }
           
-          # If the value is the maximum, randomly add -1 or 0
-          else if (data[i, col_name] == max_val) {
-            data[i, col_name] <- data[i, col_name] + sample(-1:0, 1)
-          }
-          
-          # Otherwise, randomly add -1, 0, or 1
+          # Randomly add noise
           else {
-            data[i, col_name] <- data[i, col_name] + sample(-1:1, 1)
+            
+            data[i, col_name] <- data[i, col_name] + runif(1,
+                                                           min = -noise_value,
+                                                           max = noise_value)
+            
+            # Cap ceiling
+            if (data[i, col_name] > max_val) {
+              data[i, col_name] <- max_val
+            }
+            
+            # Cap floor
+            if (data[i, col_name] < min_val) {
+              data[i, col_name] <- min_val
+            }
+            
+            # If rounding
+            if (!is.na(digits)) {
+              
+              data[i, col_name] <- round(data[i, col_name],
+                                         digits = digits)
+              
+            }
+            
           }
+
           
         }
       }

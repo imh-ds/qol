@@ -4,7 +4,7 @@
 \alias{inject_noise}
 \title{Inject Random Noise}
 \usage{
-inject_noise(data = ., iter = 1, vars = NULL)
+inject_noise(data = ., iter = 1, vars = NULL, noise_value = 1, digits = NA)
 }
 \arguments{
 \item{data}{}

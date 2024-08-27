@@ -4,12 +4,16 @@
 \alias{inject_na}
 \title{Inject Random Missingness}
 \usage{
-inject_na(data = ., prop = 0.1)
+inject_na(data = ., prop = 0.1, vars = NULL, method)
 }
 \arguments{
 \item{data}{}
 
 \item{prop}{}
+
+\item{vars}{description}
+
+\item{method}{description}
 }
 \description{
 Inject Random Missingness

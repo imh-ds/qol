@@ -18,21 +18,21 @@ freq <- function(data = .,
                  vars){
   
   # If only 1 variable
-  if(length(variables) == 1){
+  if(length(vars) == 1){
     
     # Get frequency count
     frequency <- data %>% 
-      dplyr::group_by(!!rlang::sym(variables)) %>% 
+      dplyr::group_by(!!rlang::sym(vars)) %>% 
       dplyr::count()
     
   }
   
   # If more than 1 variable
-  if(length(variables) > 1){
+  if(length(vars) > 1){
     
     frequency <- list()
     
-    for(i in variables){
+    for(i in vars){
       
       # Get frequency count
       fr <- data %>% 

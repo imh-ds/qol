@@ -6,26 +6,147 @@
 \usage{
 naugment(
   data,
-  tree_n = 150,
-  initial_n_prop = 0.1,
-  digits = 0,
+  vars = NULL,
+  covariates = NULL,
+  train_prop = c(0.1, 0.2, 0.3),
+  aug_prop = c(0.3, 0.5, 0.7),
   aug_n = nrow(data),
-  replace = FALSE
+  iter_n = 3,
+  tree_n = 100,
+  digits = 0,
+  noise_value = 1,
+  replace = FALSE,
+  bias_correction = TRUE,
+  error_correction = TRUE,
+  mean_index_weight = 0.2,
+  sd_index_weight = 0.2,
+  cor_index_weight = 0.2,
+  skew_index_weight = 0.2,
+  kurtosis_index_weight = 0.2,
+  return_all_mods = FALSE,
+  return_accuracy = TRUE
 )
 }
 \arguments{
-\item{data}{}
+\item{data}{A dataframe object. This should be a structured dataset where
+each column represents a variable and each row represents an observation.}
 
-\item{tree_n}{}
+\item{vars}{An optional vector of variable names that should be augmented. If
+\code{vars} is not specified, the function will default to augmenting the
+entire dataset (not recommended).}
 
-\item{initial_n_prop}{}
+\item{covariates}{An optional vector of variable names that should be
+resampled to be used in the training and augmentation phases. If specified
+with \code{vars}, then the specified dataframe object is automatically
+filtered to just the \code{vars} and \code{covariates}.}
 
-\item{digits}{}
+\item{train_prop}{A vector of numeric values from >0 and <1 indicating what
+proportion of the training set should randomly be injected with \code{NA}.
+Increase this value to inject more noise into the training stage. The
+default is set to \code{c(0.1, 0.2, 0.3)} for 10\%, 20\%, and 30\%
+injection of \code{NA}.}
 
-\item{aug_n}{}
+\item{aug_prop}{A vector of numeric values from >0 and <1 indicating what
+proportion of the augmented set should be randomly replaced with the random
+forest predicted values. Increase this value to insert more of the random
+forest predicted values. The default is set to \code{c(0.3, 0.5, 0.7)} for
+30\%, 50\%, and 70\% replacement.}
 
-\item{replace}{}
+\item{aug_n}{A numeric value indicating the number of observations should be
+augmented. The default is the same as the number of observations in the
+inputted data.}
+
+\item{iter_n}{A numeric value indicating how many iterations of each training
+and augmenting combinations should be run. The default is 3.}
+
+\item{tree_n}{A numeric value indicating the number of trees. The default
+number of trees is set to 100. To prevent or reduce chances of overfitting,
+lower the number of trees, particularly for larger sample sizes.}
+
+\item{digits}{A numeric value indicating the number of digits to round to.}
+
+\item{replace}{A logical value indicating whether the random selection of
+observations in the augmenting stage should be conducted with (\code{TRUE})
+or without (\code{FALSE}) replacement. The default is set to \code{FALSE}.
+\code{replace} cannot be \code{FALSE} if \code{aug_n} is greater than the
+number of observations in the inputted data. \code{replace} will
+automatically be changed to \code{TRUE} if this occurs.}
+
+\item{bias_correction}{A logical value indicating whether the model accuracy
+calculation should aim for skewness and kurtosis bias correction
+(\code{TRUE}) or bias preservation (\code{FALSE}).}
+
+\item{error_correction}{A logical value indicating whether the model accuracy
+calculation should apply a penalization (\code{TRUE}) if the average
+column-wide correlation difference between Augmented and Original data is
+positive (i.e., the augmented data shows greater average correlations
+between its variables than the original data) to reduce chances of Type I
+errors.}
+
+\item{return_all_mods}{A logical value indicating whether to return all
+generated augmented models (\code{TRUE}) or only the best performing model
+(\code{FALSE}). The default is \code{FALSE}.}
+
+\item{return_accuracy}{A logical value indicating whether to return a table
+of accuracy calculation measurements. The default is \code{TRUE}.}
 }
 \description{
-Augment Noisy Data
+Augment a dataset by generating a noisy synthetic copy of the
+  observed data using random forest.
+}
+\details{
+This function augments a dataset by introducing a specified
+  percentage of missingness into each column, using random forest imputation
+  to learn from the data, and generating synthetic data based on the trained
+  models. The process involves the following steps:
+
+ \enumerate{
+ \item Inject a specified percentage (XX\%) of missingness into each variable of
+   interest (VOI) in the observed data. This step helps to reduce the risk
+   of overfitting the Random Forest models to the measurement noise in
+   the observed data.
+ \item Use Random Forest imputation to train models on the data and store all
+   trained models.
+ \item Resample the observed data with or without replacement to the specified
+   sample size (n). If n is greater than the original sample size,
+   replacement is automatically used.
+ \item Introduce random noise into the resampled data to mimic the natural
+   measurement noise that arises from larger population samples.
+ \item Use the trained Random Forest models from Step 2 to generate predicted
+   values for each VOI using the noisy data from Step 4 as input. This
+   creates a synthetic dataset.
+ \item Inject XX\% of random missingness into the noisy data from Step 4. Replace
+   the missing values with the predicted values from Step 5, combining the
+   noisy data and synthetic data to create the final augmented dataset.
+}
+
+  These steps are repeated for all possible pairwise combinations of XX\%
+  missingness in the training dataset (Step 1) and XX\% of the noisy data to
+  be replaced with predicted values (Step 6), resulting in multiple augmented
+  datasets. This process can be iterated N times to account for the random
+  nature of missingness injection, which may produce varying qualities of
+  augmented data each time. Each augmented dataset is compared against the
+  observed data using several metrics:
+
+\itemize{
+ \item Mean (M) of each VOI
+ \item Standard Deviation (SD) of each VOI
+ \item Average inter-correlation of each VOI
+ \item Skewness of each VOI
+ \item Kurtosis of each VOI
+}
+
+  Optionally, an 'error correction' penalization can be applied to models
+  with stronger average inter-item correlations than the observed data to
+  minimize the inflation of Type I error due to overfitting.
+
+  The average differences between augmented and observed data are
+  SD-weighted, favoring models with fewer varied differences across the VOI.
+  Skewness and kurtosis of VOI are assessed to determine whether they more
+  closely match the observed data's distribution (bias preservation) or
+  achieve a more normal distribution (bias correction).
+
+  The function identifies the model that yields the best parameters across
+  all metrics (M, SD, Cor, Skew, Kurtosis) and returns the best augmented
+  dataset along with its corresponding metadata.
 }

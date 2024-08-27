@@ -47,26 +47,26 @@ calc_ind_ttest <- function(
            group)
   )
   
-  # # Outcome data
-  # out_df <- as.numeric(data[[outcome]])
-  # grp_df <- as.character(data[[group]])
-  # 
-  # # Get group standard deviations
-  # grp_sd <- tapply(out_df,
-  #                  grp_df,
-  #                  sd,
-  #                  na.rm = T)
-  # 
-  # # Get group means
-  # grp_m <- tapply(out_df,
-  #                 grp_df,
-  #                 mean,
-  #                 na.rm = T)
-  # 
-  # # Get group n
-  # grp_n <- tapply(out_df,
-  #                 grp_df,
-  #                 \(x) length(na.omit(x)))
+  # Outcome data
+  out_df <- as.numeric(data[[outcome]])
+  grp_df <- as.character(data[[group]])
+
+  # Get group standard deviations
+  grp_sd <- tapply(out_df,
+                   grp_df,
+                   sd,
+                   na.rm = T)
+
+  # Get group means
+  grp_m <- tapply(out_df,
+                  grp_df,
+                  mean,
+                  na.rm = T)
+
+  # Get group n
+  grp_n <- tapply(out_df,
+                  grp_df,
+                  \(x) length(na.omit(x)))
   
   
   
@@ -88,20 +88,13 @@ calc_ind_ttest <- function(
   df   <- t_test[["parameter"]][[1]]
   
   # Get mean difference
-  m    <- t_test[["estimate"]][[1]] - t_test[["estimate"]][[2]]
+  m_dif <- t_test[["estimate"]][[1]] - t_test[["estimate"]][[2]]
   
   # Get test statistic
   stat <- t_test[["statistic"]][[1]]
   
   # Get standard error
-  se <- m / stat
-  
-  # # Get pooled SD
-  # sd_pooled <- sqrt(
-  #   
-  #   (grp_sd[[1]]^2 + grp_sd[[2]]^2) / 2
-  #   
-  # )
+  se_dif <- m_dif / stat
   
   # Get mean difference confidence interval
   m_ci <- t_test[["conf.int"]]
@@ -111,15 +104,13 @@ calc_ind_ttest <- function(
   
   
   # Calculate effect size
-  es_df <- calc_es_d(
-    
-    outcome = data[[outcome]],
-    group = data[[group]],
-    # sd_pooled = sd_pooled,
-    es_type = es_type,
-    g_correction = g_correction,
-    conf_level = conf_level
-    
+  es_df <- calc_esm(
+    mean = as.vector(grp_m),
+    sd = as.vector(grp_sd),
+    n = as.vector(grp_n),
+    paired = FALSE,
+    conf_level = conf_level,
+    type = es_type
   )
   
   
@@ -128,15 +119,15 @@ calc_ind_ttest <- function(
     
     test = case_when(
       
-      isTRUE(var_equal) ~ "Student",
-      isFALSE(var_equal) ~ "Welch"
+      isTRUE(var_equal) ~ "Student's t",
+      isFALSE(var_equal) ~ "Welch's t"
       
     ),
     stat = stat,
     df = df,
     p = t_test[["p.value"]],
-    m_dif = m,
-    se_dif = se,
+    m_dif = m_dif,
+    se_dif = se_dif,
     m_ci_lower = m_ci_lower,
     m_ci_upper = m_ci_upper,
     es_type = es_df[["es_type"]],
@@ -145,7 +136,20 @@ calc_ind_ttest <- function(
     es_ci_lower = es_df[["es_ci_lower"]],
     es_ci_upper = es_df[["es_ci_upper"]]
     
-  )
+  ) %>% 
+    
+    # Reorder
+    dplyr::select(
+      test,
+      m_dif,
+      se_dif,
+      m_ci_lower,
+      m_ci_upper,
+      df,
+      stat,
+      p,
+      dplyr::everything()
+    )
   
   # Return
   return(tt_df)

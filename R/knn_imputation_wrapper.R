@@ -94,8 +94,6 @@ knn_impute <- function(data = .,
     
   }
   
-  
-  
   # Return imputed dataset
   return(knn_data)
   
