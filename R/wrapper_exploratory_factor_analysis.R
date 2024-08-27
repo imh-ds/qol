@@ -220,12 +220,12 @@ wrap_efa <- function(
   # Compile results
   fa_results <- list(
     
-    efa <- efa,
-    loadings <- efa_tab,
-    metrics <- efa_stats,
-    variance <- efa_var,
-    fa_scores <- efa_scores,
-    fa_weights <- efa_weights
+    efa = efa,
+    loadings = efa_tab,
+    metrics = efa_stats,
+    variance = efa_var,
+    fa_scores = efa_scores,
+    fa_weights = efa_weights
     
   )
   
