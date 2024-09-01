@@ -1,29 +1,3 @@
-
-df <- data.frame(
-  att_001 = sample(1:10,
-                   120,
-                   replace = TRUE),
-  att_002 = sample(1:10,
-                   120,
-                   replace = TRUE),
-  att_003 = sample(1:10,
-                   120,
-                   replace = TRUE),
-  att_004 = sample(1:10,
-                   120,
-                   replace = TRUE),
-  categories = rep(c("Kitty",
-                     "Puppy",
-                     "Parrot"),
-                   each = 40)
-)
-
-# Specify the variables
-vars <- c("att_001", "att_002", "att_004")
-cat <- "categories"
-
-
-
 #' Calculate Means by Group
 #'
 #' @description Calculate variable means by group.
@@ -60,7 +34,7 @@ means_by <- function(
     
     # Group by
     dplyr::group_by(
-      !!sym(group)
+      !!rlang::sym(group)
     ) %>% 
     
     # Calculate means by group
@@ -74,12 +48,12 @@ means_by <- function(
     
     # Pivot
     tidyr::pivot_longer(
-      cols = -!!sym(group),
+      cols = -!!rlang::sym(group),
       names_to = "Variable",
       values_to = "value"
     ) %>% 
     tidyr::pivot_wider(
-      names_from = !!sym(group),
+      names_from = !!rlang::sym(group),
       values_from = value
     ) %>% 
     
@@ -99,13 +73,6 @@ means_by <- function(
   return(matrix)
   
 }
-
-means_by(
-  df,
-  vars,
-  cat,
-  as_matrix = FALSE
-)
 
 
 #' Calculate a Double-Center Matrix
@@ -175,10 +142,3 @@ double_center <- function(
   return(dc_matrix)
   
 }
-
-double_center(
-  df,
-  vars,
-  cat,
-  as_matrix = FALSE
-)

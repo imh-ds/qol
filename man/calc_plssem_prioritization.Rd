@@ -15,19 +15,28 @@ calc_plssem_prioritization(
 )
 }
 \arguments{
-\item{loadings}{}
+\item{loadings}{A dataframe object of the PLS-SEM indicator loadings.}
 
-\item{weights}{}
+\item{weights}{A dataframe object of the PLS-SEM indicator weights.}
 
-\item{data}{}
+\item{data}{A dataframe object. This should be a structured dataset where
+each column represents a variable and each row represents an observation.}
 
-\item{total_estimates}{}
+\item{total_estimates}{A dataframe object of the PLS-SEM total effects.}
 
-\item{outcomes}{}
+\item{outcomes}{A vector of strings indicating the outcome variable(s).}
 
-\item{weight_type}{}
+\item{weight_type}{A string value indicating which weighting
+scheme to use in calculating the importance of individual features at the
+lower-order level. Options include \code{"se"} to weight by standard error,
+\code{"est"} to weight by item loading, or \code{"combo"} to weight by both
+standard error and item loading.}
 
-\item{cor_method}{}
+\item{cor_method}{A string value indicating which correlation
+coefficient to use in calculating the halo-effect feature weighting.
+Options include \code{"pearson"} for Pearson's correlation,
+\code{"kendall"} for Kendall rank correlation, and \code{"spearman"} for
+Spearman's rank correlation. The default is \code{"pearson"}.}
 }
 \description{
 Partial Least Squares Structural Equation Modeling Prioritization

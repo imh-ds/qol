@@ -1,7 +1,7 @@
 Package: qol
 Type: Package
 Title: Quality of Life Tools & Wrappers for Behavioral and Business Sciences
-Version: 0.1.0.3
+Version: 0.1.1.0
 Author: Hohjin Im
 Maintainer: Hohjin Im <hohjini@uci.edu>
 Description: Quality of Life Tools (qol) for behavioral and business 
@@ -26,7 +26,8 @@ Imports:
     tools,
     tidyverse,
     emmeans,
-    car
+    car,
+    rlang
 Remotes:
     github::imh-ds/cscore
 RoxygenNote: 7.3.1

@@ -25,13 +25,57 @@ wrap_plssem(
 \item{data}{A dataframe object. This should be a structured dataset where
 each column represents a variable and each row represents an observation.}
 
-\item{measurements}{Measurement model object from \code{seminr} package.
-Refer to the \code{seminr} help documentation for more details.}
+\item{measurements}{Measurement model object created using \code{constructs}
+function from the \code{seminr} package. Refer to the \code{seminr} help
+documentation for more details.}
 
-\item{structure}{Structural model object from \code{seminr} package.}
+\item{structure}{Structural model object created using the
+\code{relationships} function from \code{seminr} package. Refer to the
+\code{seminr} help documentation for more details.}
 
-\item{bootn}{Number of bootstrap replications to calculate p-values at the
-structural pathways. Default to 1000.}
+\item{bootn}{A numeric value specifying the number of bootstrap iterations to
+perform. The default value is \code{1000}. If specified to \code{0}, then
+no bootstrapping is performed.}
+
+\item{inner_weights}{A \code{seminr} parameter to specify the inner weighting
+scheme in the estimation of the inner paths matrix. Options include
+\code{seminr::path_weighting} (default) or \code{path_factorial}.}
+
+\item{missing}{A \code{seminr} parameter to specify how the model should
+handle missing values. The default is \code{seminr::mean_replacement}.}
+
+\item{missing_value}{A value indicating the missing value in the dataset. The
+default is \code{NA}.}
+
+\item{max_iter}{A numeric value indicating the maximum number of iterations
+to run when estimating PLS-SEM. The default value is \code{300}.}
+
+\item{stop_criterion}{A numeric value indicating the stop criterion for
+estimating PLS-SEM. The default value is \code{7}.}
+
+\item{digits}{A numeric value indicating the number of digits to round to.}
+
+\item{prioritization}{A logical value for whether to run feature
+prioritization analysis.}
+
+\item{prioritization_type}{A string value indicating which weighting scheme
+to use in calculating the importance of individual features to their
+composite variable. Options include \code{"loading"} to weight by indicator
+composite loading, \code{"weight"} to weight by indicator composite
+weights, or \code{"combo"} to weight by both indicator composite loadings
+and weights. The default is \code{"combo"}.}
+
+\item{prioritization_weight_type}{A string value indicating which weighting
+scheme to use in calculating the importance of individual features at the
+lower-order level. Options include \code{"se"} to weight by standard error,
+\code{"est"} to weight by item loading, or \code{"combo"} to weight by both
+standard error and item loading. The default is \code{"combo"}.}
+
+\item{prioritization_cor_method}{A string value indicating which correlation
+coefficient to use in calculating the halo-effect feature weighting.
+Options include \code{"pearson"} for Pearson's correlation,
+\code{"kendall"} for Kendall rank correlation, and \code{"spearman"} for
+Spearman's rank correlation. The default is \code{"pearson"}.}
 
 \item{file}{Location to save output file as excel workbook if specified.}
 }
@@ -69,6 +113,6 @@ plssem_wrapper(data,
 }
 \references{
 Ray S, Danks N, Calero Valdez A (2022). seminr: Building and
-Estimating Structural Equation Models. R package version 2.3.2,
-\url{https://CRAN.R-project.org/package=seminr}.
+  Estimating Structural Equation Models. R package version 2.3.2,
+  \url{https://CRAN.R-project.org/package=seminr}.
 }
