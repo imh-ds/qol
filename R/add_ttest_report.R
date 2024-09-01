@@ -1,27 +1,28 @@
-#' Add T-Test Reportable Table Format
+#' Add T-Test Reportable Table Sheet
 #'
-#' @param wb 
-#' @param sheet_name 
-#' @param ttest_object 
-#' @param name 
-#' @param digits 
+#' @param wb An \code{openxlsx} workbook object to apply the format to.
+#' @param sheet_name A character string reflecting the sheet.
+#' @param ttest_object The t-test object from \code{wrap_ttest}.
+#' @param name An optional character string indicating the name of the study.
+#' @param digits A numeric value indicating the number of digits to round to.
+#' @param report_variance A string value or vector of strings indicating which
+#'   variance measure to report. Options include \code{"sd"} for standard
+#'   deviation, \code{"se"} for standard error, or \code{c("sd", "se")} for
+#'   both. The default is standard deviation \code{"sd"}.
+#' @param report_test A string value indicating which t-test statistic to
+#'   report. Options include \code{"student"} for Student's t-test,
+#'   \code{"welch"} for Welch's t-test, and \code{"wilcox"} for Wilcoxon
+#'   Rank-Sum W test / Mann-Whitney U test. The default is \code{"welch"}.
 #'
-#' @return
-#' @export
-#'
-#' @examples
 add_ttest_report <- function(
-    
   wb,
   sheet_name,
   ttest_object,
   name = NULL,
   digits = 3,
-  report_variance,
-  report_test
-  
+  report_variance = "sd",
+  report_test = "welch"
 ) {
-  
   
   # PARAMETERS --------------------------------------------------------------
   
@@ -238,4 +239,3 @@ add_ttest_report <- function(
                           showGridLines = FALSE)
   
 }
-

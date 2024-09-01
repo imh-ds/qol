@@ -4,7 +4,7 @@
 \alias{add_plssem_load_wgt}
 \title{Add PLS-SEM Model Loadings & Weight Workbook Sheet}
 \usage{
-add_plssem_load_wgt(wb, plssem_mod, sheet_name, digits = 3)
+add_plssem_load_wgt(wb, plssem_mod, sheet_name, name = NULL, digits = 3)
 }
 \arguments{
 \item{wb}{}

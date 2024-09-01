@@ -10,13 +10,13 @@
 #'
 #' @export
 write_anova <- function(
-    anova_object,
-    filename,
-    study_name = NULL,
-    assumptions = FALSE,
-    digits = 3,
-    summary_type = 1,
-    report_es = NULL
+  anova_object,
+  filename,
+  study_name = NULL,
+  assumptions = FALSE,
+  digits = 3,
+  summary_type = 1,
+  report_es = NULL
 ) {
   
   # Create wb

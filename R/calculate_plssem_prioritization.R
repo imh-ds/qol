@@ -1,12 +1,21 @@
 #' Partial Least Squares Structural Equation Modeling Prioritization
 #'
-#' @param loadings 
-#' @param weights 
-#' @param data 
-#' @param total_estimates 
-#' @param outcomes 
-#' @param weight_type 
-#' @param cor_method 
+#' @param loadings A dataframe object of the PLS-SEM indicator loadings.
+#' @param weights A dataframe object of the PLS-SEM indicator weights.
+#' @param data A dataframe object. This should be a structured dataset where
+#'   each column represents a variable and each row represents an observation.
+#' @param total_estimates A dataframe object of the PLS-SEM total effects.
+#' @param outcomes A vector of strings indicating the outcome variable(s).
+#' @param weight_type A string value indicating which weighting
+#'   scheme to use in calculating the importance of individual features at the
+#'   lower-order level. Options include \code{"se"} to weight by standard error,
+#'   \code{"est"} to weight by item loading, or \code{"combo"} to weight by both
+#'   standard error and item loading.
+#' @param cor_method A string value indicating which correlation
+#'   coefficient to use in calculating the halo-effect feature weighting.
+#'   Options include \code{"pearson"} for Pearson's correlation,
+#'   \code{"kendall"} for Kendall rank correlation, and \code{"spearman"} for
+#'   Spearman's rank correlation. The default is \code{"pearson"}.
 #'
 #' @export
 calc_plssem_prioritization <- function(
@@ -16,7 +25,8 @@ calc_plssem_prioritization <- function(
     total_estimates,
     outcomes,
     weight_type = "combo",
-    cor_method = "pearson") {
+    cor_method = "pearson"
+) {
   
   # Check if both arguments are empty
   if (length(loadings) == 0 && length(weights) == 0) {

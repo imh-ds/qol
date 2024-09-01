@@ -39,11 +39,13 @@
 #' doi:10.18637/jss.v074.i07
 #' 
 #' @export
-knn_impute <- function(data = .,
-                       outcomes = NULL,
-                       demographics = NULL,
-                       id = NULL,
-                       k = 10){
+knn_impute <- function(
+    data = .,
+    outcomes = NULL,
+    demographics = NULL,
+    id = NULL,
+    k = 10
+){
   
   if ((is.null(outcomes) & !is.null(id)) |
       (is.null(id) & !is.null(outcomes))) {
@@ -83,9 +85,11 @@ knn_impute <- function(data = .,
     
     # Merge with the id variable
     knn_data <- knn_sub %>% 
-      inner_join(knn_out %>% 
-                   dplyr::select(all_of(outcomes), id),
-                 by = id)
+      dplyr::inner_join(
+        knn_out %>% 
+          dplyr::select(
+            dplyr::all_of(outcomes), id),
+        by = id)
     
   } else {
     
@@ -94,7 +98,7 @@ knn_impute <- function(data = .,
     
   }
   
-  # Return imputed dataset
+  # Return
   return(knn_data)
   
 }

@@ -9,7 +9,7 @@
 #' 
 #' @param data A dataframe object. This should be a structured dataset where
 #' each column represents a variable and each row represents an observation.
-#' @param variables A required vector of column names representing their 
+#' @param vars A required vector of column names representing their 
 #' manifest variables.
 #' @param values A required vector of numeric or string values to be replaced
 #' with NA.
@@ -19,10 +19,10 @@
 #' 
 #' @examples
 #' replace_with_na(data,
-#'                 variables = c("var1", "var2"),
+#'                 vars = c("var1", "var2"),
 #'                 values = c(99, 98))
 #' replace_with_na(data,
-#'                 variables = c("educ"),
+#'                 vars = c("educ"),
 #'                 values = c("Unknown", "Prefer not to say"))
 #' 
 #' @references
@@ -32,16 +32,22 @@
 #' doi:10.18637/jss.v105.i07.
 #' 
 #' @export
-replace_with_na <- function(data = .,
-                            variables,
-                            values){
+replace_with_na <- function(
+    data = .,
+    vars,
+    values
+){
   
   # Change values in variables to NA
   data <- data %>% 
-    dplyr::mutate(dplyr::across(.cols = dplyr::all_of(variables),
-                                ~replace(., . %in% values, NA)))
+    dplyr::mutate(
+      dplyr::across(
+        .cols = dplyr::all_of(vars),
+        ~replace(., . %in% values, NA)
+      )
+    )
   
-  # Return data
+  # Return
   return(data)
   
 }

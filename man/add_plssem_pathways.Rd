@@ -4,7 +4,7 @@
 \alias{add_plssem_pathways}
 \title{Affix PLS-SEM Model Pathways Workbook Sheet}
 \usage{
-add_plssem_pathways(wb, plssem_mod, sheet_name, digits = 3)
+add_plssem_pathways(wb, plssem_mod, sheet_name, name = NULL, digits = 3)
 }
 \arguments{
 \item{wb}{}

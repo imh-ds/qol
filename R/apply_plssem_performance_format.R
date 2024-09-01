@@ -7,7 +7,7 @@
 #' @param start_row 
 #'
 #' @export
-apply_perf_formatter <- function(
+apply_plssem_perf_formatter <- function(
     wb,
     sheet,
     df,
@@ -95,8 +95,5 @@ apply_perf_formatter <- function(
                      cols = (start_col+1):(mod_col+1),
                      rows = (start_row+2):(start_row+mod_row),
                      gridExpand = TRUE)
-  
-  # Return
-  return(wb)
   
 }

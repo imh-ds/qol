@@ -4,7 +4,7 @@
 \alias{add_plssem_prioritization}
 \title{Add PLS-SEM Prioritization Workbook Sheet}
 \usage{
-add_plssem_prioritization(wb, plssem_mod, sheet_name, digits = 3)
+add_plssem_prioritization(wb, plssem_mod, sheet_name, name = NULL, digits = 3)
 }
 \arguments{
 \item{wb}{}

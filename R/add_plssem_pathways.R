@@ -7,21 +7,78 @@
 #'
 #' @export
 add_plssem_pathways <- function(
-    
   wb,
   plssem_mod,
   sheet_name,
+  name = NULL,
   digits = 3
-  
 ) {
+  
+  # Set parameter for rounding
+  rnd <- paste0('%.',
+                digits,
+                "f")
   
   # Detect whether indirect effects are in the PLS-SEM
   # If so, combine into one pathway model. Otherwise, only extract direct effects.
-  if (isTRUE(plssem_mod[["Meta_Data"]][["indirect_effects"]])) {
+  if (isTRUE(plssem_mod[["meta_data"]][["indirect_effects"]])) {
     
     # Get both direct & indirect pathway effects
-    direct_effs <- plssem_mod[["Direct_Effects"]]
-    indirect_effs <- plssem_mod[["Indirect_Effects"]]
+    direct_effs <- plssem_mod[["Direct_Effects"]] %>% 
+      
+      # Generate texts
+      dplyr::mutate(
+        in_text = paste("(\u03B2 = ",
+                        sprintf(rnd,
+                                boot_est),
+                        ", SE = ", base::sprintf(rnd, boot_se),
+                        ", z = ", sprintf(rnd,z),
+                        ", 95% CI [", sprintf(rnd,lower_ci),
+                        ", ", sprintf(rnd,upper_ci),
+                        "], p ", ifelse(p < 0.001, "< 0.001", paste("=", sprintf(rnd,p))),")",
+                        sep = ""),
+        fig_text = paste(sprintf(rnd, boot_est),
+                         case_when(
+                           
+                           p > .05 ~ "",
+                           p < .05 & p > .01 ~ "*",
+                           p < .01 & p > .001 ~ "**",
+                           p < .001 ~ "***"
+                           
+                         ),
+                         " [", sprintf(rnd,lower_ci),
+                         ", ", sprintf(rnd,upper_ci),
+                         "]",
+                         sep = "")
+      )
+      
+    indirect_effs <- plssem_mod[["Indirect_Effects"]] %>% 
+      
+      # Generate texts
+      dplyr::mutate(
+        in_text = paste("(\u03B2 = ",
+                        sprintf(rnd,
+                                boot_est),
+                        ", SE = ", base::sprintf(rnd, boot_se),
+                        ", z = ", sprintf(rnd,z),
+                        ", 95% CI [", sprintf(rnd,lower_ci),
+                        ", ", sprintf(rnd,upper_ci),
+                        "], p ", ifelse(p < 0.001, "< 0.001", paste("=", sprintf(rnd, p))),")",
+                        sep = ""),
+        fig_text = paste(sprintf(rnd, boot_est),
+                         dplyr::case_when(
+                           
+                           p > .05 ~ "",
+                           p < .05 & p > .01 ~ "*",
+                           p < .01 & p > .001 ~ "**",
+                           p < .001 ~ "***"
+                           
+                         ),
+                         " [", sprintf(rnd, lower_ci),
+                         ", ", sprintf(rnd, upper_ci),
+                         "]",
+                         sep = "")
+      )
     
     # Get nrow lengths for formatting later
     de_row <- nrow(direct_effs)
@@ -61,7 +118,33 @@ add_plssem_pathways <- function(
   } else {
     
     # Get direct pathway effects
-    effects <- plssem_mod[["Direct_Effects"]]
+    effects <- plssem_mod[["Direct_Effects"]] %>% 
+      
+      # Generate texts
+      dplyr::mutate(
+        in_text = paste("(\u03B2 = ",
+                        sprintf(rnd,
+                                boot_est),
+                        ", SE = ", base::sprintf(rnd, boot_se),
+                        ", z = ", sprintf(rnd, z),
+                        ", 95% CI [", sprintf(rnd, lower_ci),
+                        ", ", sprintf(rnd, upper_ci),
+                        "], p ", ifelse(p < 0.001, "< 0.001", paste("=", sprintf(rnd, p))),")",
+                        sep = ""),
+        fig_text = paste(sprintf(rnd, boot_est),
+                         dplyr::case_when(
+                           
+                           p > .05 ~ "",
+                           p < .05 & p > .01 ~ "*",
+                           p < .01 & p > .001 ~ "**",
+                           p < .001 ~ "***"
+                           
+                         ),
+                         " [", sprintf(rnd, lower_ci),
+                         ", ", sprintf(rnd, upper_ci),
+                         "]",
+                         sep = "")
+      )
     
   }
   
@@ -154,53 +237,83 @@ add_plssem_pathways <- function(
   start_row = 3
   
   
-  # -- WRITE PATHWAY TABLE -- #
+  
+  # TITLE -------------------------------------------------------------------
+  
+  openxlsx::writeData(
+    wb = wb,
+    sheet = sheet_name,
+    x = if(!is.null(name)) {
+      paste0(name,
+             " - PLS-SEM Pathways Table")
+    } else {
+      "PLS-SEM Pathways Table"
+    },
+    startCol = start_col,
+    startRow = start_row
+  )
+  
+  # Apply title format
+  openxlsx::addStyle(
+    wb = wb,
+    sheet = sheet_name,
+    style = openxlsx::createStyle(
+      fontSize = 20,
+      textDecoration = "bold"
+    ),
+    cols = start_col,
+    rows = start_row
+  )
+  
+  
+
+  # WRITE TABLE -------------------------------------------------------------
   
   openxlsx::writeData(
     wb,
     sheet = sheet_name,
     x = "Pathway Table",
     startCol = start_col,
-    startRow = start_row
+    startRow = start_row + 2
   )
   openxlsx::mergeCells(
     wb,
     sheet = sheet_name,
     cols = 6:7,
-    rows = start_row+1
+    rows = start_row + 3
   )
   openxlsx::writeData(
     wb,
     sheet = sheet_name,
     x = "95% CI",
     startCol = 6,
-    startRow = start_row+1
+    startRow = start_row + 3
   )
   openxlsx::writeData(
     wb,
     sheet = sheet_name,
     x = model,
     startCol = start_col,
-    startRow = start_row+2
+    startRow = start_row + 4
   )
   openxlsx::writeData(
     wb,
     sheet = sheet_name,
     x = "NOTE: \u1D47 bootstrapped values.",
     startCol = start_col,
-    startRow = start_row + 2 + mod_row + 1
+    startRow = start_row + 4 + mod_row + 1
   )
   
   # Apply formatter
-  apply_path_formatter(
+  apply_plssem_path_formatter(
     wb = wb,
     sheet = sheet_name,
     df = model,
     start_col = start_col,
-    start_row = start_row,
+    start_row = start_row + 2,
     digits = digits,
-    direct_nrow = if(isTRUE(plssem_mod[["Meta_Data"]][["indirect_effects"]])) {de_row} else {NULL},
-    indirect_nrow = if(isTRUE(plssem_mod[["Meta_Data"]][["indirect_effects"]])) {ie_row} else {NULL}
+    direct_nrow = if(isTRUE(plssem_mod[["meta_data"]][["indirect_effects"]])) {de_row} else {NULL},
+    indirect_nrow = if(isTRUE(plssem_mod[["meta_data"]][["indirect_effects"]])) {ie_row} else {NULL}
   )
   
   
@@ -209,23 +322,23 @@ add_plssem_pathways <- function(
     sheet = sheet_name,
     x = "Pathway Text",
     startCol = (start_col + 1 + mod_col),
-    startRow = start_row
+    startRow = start_row + 2
   )
   openxlsx::writeData(
     wb,
     sheet = sheet_name,
     x = model_txt,
     startCol = (start_col + 1 + mod_col),
-    startRow = (start_row + 2)
+    startRow = (start_row + 4)
   )
   
   # Apply formatter
-  apply_text_formatter(
+  apply_text_format(
     wb = wb,
     sheet = sheet_name,
     df = model_txt,
     start_col = (start_col + 1 + mod_col),
-    start_row = start_row,
+    start_row = start_row + 2,
     digits = digits
   )
   

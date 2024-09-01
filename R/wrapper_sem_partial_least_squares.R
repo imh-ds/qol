@@ -1,21 +1,55 @@
 #' Partial Least Squares Structural Equation Modeling Wrapper
-#' 
+#'
 #' @description A wrapper function to automate PLS-SEM and extracting its
 #'   results. The current function is limited to only 2 serial mediators. Due to
 #'   the undue level of complexity added to the model estimations when there are
 #'   3 or more serial mediators, the current function is not designed to handle
 #'   this type of model. This automation function uses the \code{seminr} package
 #'   (Ray et al., 2022).
-#' 
+#'
 #' @param data A dataframe object. This should be a structured dataset where
 #'   each column represents a variable and each row represents an observation.
-#' @param measurements Measurement model object from \code{seminr} package.
-#'   Refer to the \code{seminr} help documentation for more details.
-#' @param structure Structural model object from \code{seminr} package.
+#' @param measurements Measurement model object created using \code{constructs}
+#'   function from the \code{seminr} package. Refer to the \code{seminr} help
+#'   documentation for more details.
+#' @param structure Structural model object created using the
+#'   \code{relationships} function from \code{seminr} package. Refer to the
+#'   \code{seminr} help documentation for more details.
+#' @param bootn A numeric value specifying the number of bootstrap iterations to
+#'   perform. The default value is \code{1000}. If specified to \code{0}, then
+#'   no bootstrapping is performed.
+#' @param inner_weights A \code{seminr} parameter to specify the inner weighting
+#'   scheme in the estimation of the inner paths matrix. Options include
+#'   \code{seminr::path_weighting} (default) or \code{path_factorial}.
+#' @param missing A \code{seminr} parameter to specify how the model should
+#'   handle missing values. The default is \code{seminr::mean_replacement}.
+#' @param missing_value A value indicating the missing value in the dataset. The
+#'   default is \code{NA}.
+#' @param max_iter A numeric value indicating the maximum number of iterations
+#'   to run when estimating PLS-SEM. The default value is \code{300}.
+#' @param stop_criterion A numeric value indicating the stop criterion for
+#'   estimating PLS-SEM. The default value is \code{7}.
+#' @param digits A numeric value indicating the number of digits to round to.
+#' @param prioritization A logical value for whether to run feature
+#'   prioritization analysis.
+#' @param prioritization_type A string value indicating which weighting scheme
+#'   to use in calculating the importance of individual features to their
+#'   composite variable. Options include \code{"loading"} to weight by indicator
+#'   composite loading, \code{"weight"} to weight by indicator composite
+#'   weights, or \code{"combo"} to weight by both indicator composite loadings
+#'   and weights. The default is \code{"combo"}.
+#' @param prioritization_weight_type A string value indicating which weighting
+#'   scheme to use in calculating the importance of individual features at the
+#'   lower-order level. Options include \code{"se"} to weight by standard error,
+#'   \code{"est"} to weight by item loading, or \code{"combo"} to weight by both
+#'   standard error and item loading. The default is \code{"combo"}.
+#' @param prioritization_cor_method A string value indicating which correlation
+#'   coefficient to use in calculating the halo-effect feature weighting.
+#'   Options include \code{"pearson"} for Pearson's correlation,
+#'   \code{"kendall"} for Kendall rank correlation, and \code{"spearman"} for
+#'   Spearman's rank correlation. The default is \code{"pearson"}.
 #' @param file Location to save output file as excel workbook if specified.
-#' @param bootn Number of bootstrap replications to calculate p-values at the
-#'   structural pathways. Default to 1000.
-#' 
+#'
 #' @examples
 #' measurements <- constructs(
 #'   composite("comp1", multi_items("com", 1:3)),
@@ -26,26 +60,25 @@
 #'   composite("outcome", multi_items("out", 1:5)),
 #'   interaction_term(iv = "high_comp", moderator = "mani1", method = two_stage)
 #' )
-#' 
+#'
 #' structure <- relationships(
 #'   paths(from = c("high_comp"),
 #'         to = c("mani1", "mani2")),
 #'   paths(from = c("high_comp", "mani1", "mani2", "high_comp*mani1"),
 #'         to = c("outcome"))
 #' )
-#' 
+#'
 #' plssem_wrapper(data,
 #'                measurements,
 #'                structure)
-#' 
-#' 
+#'
+#'
 #' @references Ray S, Danks N, Calero Valdez A (2022). seminr: Building and
-#' Estimating Structural Equation Models. R package version 2.3.2,
-#' \url{https://CRAN.R-project.org/package=seminr}.
-#' 
+#'   Estimating Structural Equation Models. R package version 2.3.2,
+#'   \url{https://CRAN.R-project.org/package=seminr}.
+#'
 #' @export
 wrap_plssem <- function(
-    
     data = .,
     measurements,
     structure,
@@ -60,7 +93,6 @@ wrap_plssem <- function(
     prioritization_type = "combo",
     prioritization_weight_type = "combo",
     prioritization_cor_method = "pearson"
-    
 ) {
   
 
@@ -188,8 +220,8 @@ wrap_plssem <- function(
     dplyr::mutate(variable = base::gsub("\\*",
                                         " \u00D7 ",
                                         variable)) %>% 
-    qol::replace_with_na(variables = dplyr::everything(),
-                         values = 0)
+    replace_with_na(vars = dplyr::everything(),
+                    values = 0)
   
   
   
@@ -580,228 +612,34 @@ wrap_plssem <- function(
     dplyr::mutate(
       path = gsub("\\*", " \u00D7 ", path),
       z = boot_est / boot_se,
-      p = 2 * pnorm(-abs(z)),
-      in_text = paste("(\u03B2 = ",
-                      sprintf(rnd,
-                              boot_est),
-                      ", SE = ", base::sprintf(rnd, boot_se),
-                      ", z = ", sprintf(rnd,z),
-                      ", 95% CI [", sprintf(rnd,lower_ci),
-                      ", ", sprintf(rnd,upper_ci),
-                      "], p ", ifelse(p < 0.001, "< 0.001", paste("=", sprintf(rnd,p))),")",
-                      sep = ""),
-      fig_text = paste(sprintf(rnd, boot_est),
-                       case_when(
-                         
-                         p > .05 ~ "",
-                         p < .05 & p > .01 ~ "*",
-                         p < .01 & p > .001 ~ "**",
-                         p < .001 ~ "***"
-                         
-                       ),
-                       " [", sprintf(rnd,lower_ci),
-                       ", ", sprintf(rnd,upper_ci),
-                       "]",
-                       sep = "")) %>% 
+      p = 2 * pnorm(-abs(z))
+      # in_text = paste("(\u03B2 = ",
+      #                 sprintf(rnd,
+      #                         boot_est),
+      #                 ", SE = ", base::sprintf(rnd, boot_se),
+      #                 ", z = ", sprintf(rnd,z),
+      #                 ", 95% CI [", sprintf(rnd,lower_ci),
+      #                 ", ", sprintf(rnd,upper_ci),
+      #                 "], p ", ifelse(p < 0.001, "< 0.001", paste("=", sprintf(rnd,p))),")",
+      #                 sep = ""),
+      # fig_text = paste(sprintf(rnd, boot_est),
+      #                  case_when(
+      #                    
+      #                    p > .05 ~ "",
+      #                    p < .05 & p > .01 ~ "*",
+      #                    p < .01 & p > .001 ~ "**",
+      #                    p < .001 ~ "***"
+      #                    
+      #                  ),
+      #                  " [", sprintf(rnd,lower_ci),
+      #                  ", ", sprintf(rnd,upper_ci),
+      #                  "]",
+      #                  sep = "")
+      ) %>% 
       
     # Relocate Z
     dplyr::relocate(c(z),
                     .after = boot_se)
-  
-  
-
-  # REGRESSION TABLE - LONG FORMAT ------------------------------------------
-
-  # Loop for every endogenous variables (e.g., mediators,)
-  reg_list_long <- base::lapply(
-    
-    paths,
-    function(var) {
-      
-      pt_outcome <- paths_tab %>%
-        dplyr::filter(grepl(paste0(var,"$"),
-                            path))
-      
-      pt_est <- pt_outcome %>% 
-        dplyr::mutate(std_est = paste(sprintf(rnd, boot_est),
-                                      case_when(
-                                        
-                                        p > .05 ~ "",
-                                        p < .05 & p > .01 ~ "*",
-                                        p < .01 & p > .001 ~ "**",
-                                        p < .001 ~ "***"
-                                        
-                                      ))) %>% 
-        dplyr::select(path, std_est)
-      
-      pt_ci <- pt_outcome %>% 
-        dplyr::mutate(ci = paste0("(",
-                                  sprintf(rnd, lower_ci),
-                                  ", ",
-                                  sprintf(rnd, upper_ci),
-                                  ")")) %>% 
-        dplyr::select(path,
-                      ci)
-      
-      # Get degrees of freedom for number of predictors (numerator)
-      degfree1 <- length(pt_est[["path"]])
-      
-      # Get degrees of freedom for number of observations minus predictors - 1 (denominator)
-      degfree2 <- nrow(pls_model[["construct_scores"]]) - (1 + degfree1)
-      
-      pt_df1 <- data.frame("est" = c(rbind(pt_est[["std_est"]],
-                                           pt_ci[["ci"]])))
-      pt_df2 <- data.frame("variable" = c(rbind(pt_est[["path"]],
-                                                paste0(sub("(.*)  ->  .*", "\\1",
-                                                           pt_est[["path"]]),"_CI")))) %>% 
-        dplyr::mutate(variable = gsub("  ->.*", "", variable))
-      pt_df3 <- data.frame("variable" = c("Observations",
-                                          "R\u00B2",
-                                          "R\u00B2 Adj"),
-                           "est" = c(nrow(pls_model[["construct_scores"]]),
-                                     sprintf(rnd,
-                                             as.data.frame(pls_model[["rSquared"]])[[var]])))
-      
-      # Get R^2 value for F-statistic calculation
-      rsqr <- as.data.frame(pls_model[["rSquared"]])[[var]][1]
-      
-      # Calculate F-statistic
-      pt_df4 <- data.frame("variable" = c("F"),
-                           "est" = sprintf(rnd, 
-                                           (rsqr / (1 - rsqr)) * (degfree2 / degfree1)))
-      
-      pt_table <- pt_df2 %>%
-        cbind(pt_df1) %>% 
-        rbind(pt_df3) %>% 
-        rbind(pt_df4) %>% 
-        dplyr::rename(!!sym(var) := est)
-      
-      return(pt_table)
-      
-    }
-    
-  )
-  
-  # Reduce
-  reg_tab_long <- base::suppressMessages(
-      
-      purrr::reduce(reg_list_long,
-                    dplyr::full_join)
-      
-    )
-  
-  # Collapse the path table list into one dataframe and send R^2 to the bottom
-  reg_tab_longeff <- reg_tab_long %>%
-    dplyr::filter(
-      
-      !base::grepl("R\\\u00B2|^Observations$|^F$",
-                   variable)
-      
-    )
-  
-  reg_tab_longdesc <- reg_tab_long %>%
-    dplyr::filter(
-      
-      base::grepl("R\\\u00B2|^Observations$|^F$",
-                  variable)
-      
-    )
-  
-  # Combine into final product
-  reg_long_table <- rbind(reg_tab_longeff,
-                          reg_tab_longdesc) %>% 
-    dplyr::mutate(variable = ifelse(grepl("_CI", variable), NA, variable)) %>% 
-    dplyr::mutate(variable = gsub("\\*", " \u00D7 ", variable))
-  
-  
-
-  # REGRESSION TABLE - WIDE FORMAT ------------------------------------------
-
-  reg_list_wide <- lapply(
-    paths,
-    function(var) {
-      
-      pt_outcome <- paths_tab %>%
-        dplyr::filter(grepl(paste0(var,"$"),
-                            path))
-      
-      pt_est <- pt_outcome %>% 
-        dplyr::select(path,
-                      boot_est,
-                      lower_ci,
-                      upper_ci,
-                      p)
-      
-      # Clean up labels of variables
-      pt_reg <- pt_est %>% 
-        dplyr::mutate(path = gsub("  ->.*", "", path))
-      
-      # Get basic model descriptives and metrics
-      pt_desc <- data.frame("path" = c("Observations",
-                                       "R\u00B2",
-                                       "R\u00B2 Adj"),
-                            "boot_est" = c(nrow(pls_model[["construct_scores"]]),
-                                           as.data.frame(pls_model[["rSquared"]])[[var]]),
-                            "lower_ci" = rep(NA,3),
-                            "upper_ci" = rep(NA,3),
-                            "p" = rep(NA,3))
-      
-      # Get degrees of freedom for number of predictors (numerator)
-      degfree1 <- length(pt_est[["path"]])
-      # Get degrees of freedom for number of observations minus predictors - 1 (denominator)
-      degfree2 <- nrow(pls_model[["construct_scores"]]) - (1 + degfree1)
-      
-      # Get R^2 value for F-statistic calculation
-      rsqr <- as.data.frame(pls_model[["rSquared"]])[[var]][1]
-      
-      # Calculate F-statistic
-      pt_fstat <- data.frame("path" = c("F"),
-                             "boot_est" = (rsqr / (1 - rsqr)) * (degfree2 / degfree1),
-                             "lower_ci" = NA,
-                             "upper_ci" = NA,
-                             "p" = NA)
-      
-      # Create table
-      pt_table <- rbind(pt_reg,
-                        pt_desc,
-                        pt_fstat) %>%
-        dplyr::rename("variable" = path,
-                      !!sym(paste0(var," est")) := boot_est,
-                      !!sym(paste0(var," lower")) := lower_ci,
-                      !!sym(paste0(var," upper")) := upper_ci,
-                      !!sym(paste0(var," p")) := p)
-      
-      # Return
-      return(pt_table)
-      
-    }
-  )
-  
-  # Collapse the path table list into one dataframe and send R^2 to the bottom
-  reg_tab_wideeff <- suppressMessages(
-    
-    purrr::reduce(reg_list_wide,
-                  dplyr::full_join)
-    
-  ) %>%
-    dplyr::filter(
-      !grepl("R\\\u00B2|^Observations$|^F$",
-             variable)
-    )
-  
-  reg_tab_widedesc <- suppressMessages(
-    purrr::reduce(reg_list_wide,
-                  dplyr::full_join)
-  ) %>%
-    dplyr::filter(
-      grepl("R\\\u00B2|^Observations$|^F$",
-            variable)
-    )
-  
-  # Combine into final product
-  reg_wide_table <- rbind(reg_tab_wideeff,
-                          reg_tab_widedesc)
-
   
 
   # RETURN RESULTS ----------------------------------------------------------
@@ -826,9 +664,7 @@ wrap_plssem <- function(
     "Loadings" = modelloadings,
     "Weights_Table" = mod_weights,
     "Weights" = modelweights,
-    "Total_Effects" = modeltoteffs,
-    "Tables_Long" = reg_long_table,
-    "Tables_Wide" = reg_wide_table
+    "Total_Effects" = modeltoteffs
     
   )
   
@@ -943,31 +779,8 @@ wrap_plssem <- function(
       ) %>% 
       dplyr::mutate(path = base::gsub("\\*", " \u00D7 ", path),
                     z = boot_est / boot_se,
-                    p = 2*stats::pnorm(-base::abs(z)),
-                    in_text = base::paste0(
-                      "(\u03B2 = ", base::sprintf(rnd, boot_est),
-                      ", SE = ", base::sprintf(rnd, boot_se),
-                      ", z = ", base::sprintf(rnd, z),
-                      ", 95% CI [", base::sprintf(rnd, lower_ci),
-                      ", ", base::sprintf(rnd, upper_ci),
-                      "], p ", base::ifelse(p < 0.001, "< 0.001",
-                                            base::paste("=", 
-                                                        base::sprintf(rnd, 
-                                                                      p))),
-                      ")"),
-                    fig_text = paste(sprintf(rnd, boot_est),
-                                     case_when(
-                                       
-                                       p > .05 ~ "",
-                                       p < .05 & p > .01 ~ "*",
-                                       p < .01 & p > .001 ~ "**",
-                                       p < .001 ~ "***"
-                                       
-                                     ),
-                                     " [", sprintf(rnd,lower_ci),
-                                     ", ", sprintf(rnd,upper_ci),
-                                     "]",
-                                     sep = "")) %>% 
+                    p = 2*stats::pnorm(-base::abs(z))
+                    ) %>% 
     dplyr::relocate(z,
                     .after = boot_se)
     

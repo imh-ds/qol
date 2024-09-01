@@ -11,6 +11,7 @@ add_plssem_prioritization <- function(
   wb,
   plssem_mod,
   sheet_name,
+  name = NULL,
   digits = 3
   
 ) {
@@ -132,6 +133,34 @@ add_plssem_prioritization <- function(
   wgt_col <- ncol(wgt_table)
   
   
+  # TITLE -------------------------------------------------------------------
+  
+  openxlsx::writeData(
+    wb = wb,
+    sheet = sheet_name,
+    x = if(!is.null(name)) {
+      paste0(name,
+             " - PLS-SEM Prioritization Analysis")
+    } else {
+      "PLS-SEM Prioritization Analysis"
+    },
+    startCol = start_col,
+    startRow = start_row
+  )
+  
+  # Apply title format
+  openxlsx::addStyle(
+    wb = wb,
+    sheet = sheet_name,
+    style = openxlsx::createStyle(
+      fontSize = 20,
+      textDecoration = "bold"
+    ),
+    cols = start_col,
+    rows = start_row
+  )
+  
+  
   # MERGE CELLS -------------------------------------------------------------
   
   # Prioritization Title merge cells
@@ -139,8 +168,9 @@ add_plssem_prioritization <- function(
     wb,
     sheet = sheet_name,
     cols = start_col:(start_col+1),
-    rows = (start_row + 1 + tot_row + 3):(start_row + 1 + tot_row + 4)
+    rows = (start_row + 3 + tot_row + 3):(start_row + 3 + tot_row + 4)
   )
+  
   
   # WRITE DATA --------------------------------------------------------------
   
@@ -152,7 +182,7 @@ add_plssem_prioritization <- function(
     sheet = sheet_name,
     x = "Total Effects",
     startCol = start_col,
-    startRow = start_row
+    startRow = start_row + 2
   )
   
   # Write Total Effects table
@@ -161,7 +191,7 @@ add_plssem_prioritization <- function(
     sheet = sheet_name,
     x = tot_table,
     startCol = start_col,
-    startRow = start_row + 1,
+    startRow = start_row + 3,
     tableStyle = "TableStyleMedium2"
   )
   
@@ -171,7 +201,7 @@ add_plssem_prioritization <- function(
     sheet = sheet_name,
     x = "Note: Values closer to 1 = stronger effect.",
     startCol = start_col,
-    startRow = start_row + 1 + tot_row + 1
+    startRow = start_row + 3 + tot_row + 1
   )
   
   
@@ -183,7 +213,7 @@ add_plssem_prioritization <- function(
     sheet = sheet_name,
     x = "Prioritization Analysis",
     startCol = start_col,
-    startRow = start_row + 1 + tot_row + 3
+    startRow = start_row + 3 + tot_row + 3
   )
   
   # Write Prioritization table
@@ -192,7 +222,7 @@ add_plssem_prioritization <- function(
     sheet = sheet_name,
     x = prio_table,
     startCol = start_col,
-    startRow = start_row + 1 + tot_row + 5,
+    startRow = start_row + 3 + tot_row + 5,
     tableStyle = "TableStyleMedium2"
   )
   
@@ -202,7 +232,7 @@ add_plssem_prioritization <- function(
     sheet = sheet_name,
     x = "Note: > 100 = Above average; < 100 = Below Average",
     startCol = start_col,
-    startRow = start_row + 1 + tot_row + 5 + prio_row + 1
+    startRow = start_row + 3 + tot_row + 5 + prio_row + 1
   )
   
   
@@ -215,7 +245,7 @@ add_plssem_prioritization <- function(
     sheet = sheet_name,
     x = "Indicator Weights",
     startCol = start_col + tot_col + 1,
-    startRow = start_row
+    startRow = start_row + 2
   )
   
   # Write Normalized Weights table
@@ -224,7 +254,7 @@ add_plssem_prioritization <- function(
     sheet = sheet_name,
     x = wgt_table,
     startCol = start_col + tot_col + 1,
-    startRow = start_row + 1,
+    startRow = start_row + 3,
     tableStyle = "TableStyleMedium2"
   )
   
@@ -234,7 +264,7 @@ add_plssem_prioritization <- function(
     sheet = sheet_name,
     x = "NOTE: Weights are normalized to sum to 1.",
     startCol = start_col + tot_col + 1,
-    startRow = start_row + wgt_row + 2
+    startRow = start_row + 2 + wgt_row + 2
   )
   
   
@@ -262,7 +292,7 @@ add_plssem_prioritization <- function(
     halign = "center"
   )
   body_rnd_style <- openxlsx::createStyle(
-    numFmt = "0.000",
+    numFmt = paste0("0.", paste(rep(0, digits), collapse = "")),
     halign = "center"
   )
   
@@ -270,75 +300,58 @@ add_plssem_prioritization <- function(
   # -- APPLY FORMATTING -- #
   
   # Titles
-  openxlsx::addStyle(
-    wb,
-    sheet = sheet_name,
-    style = title_style,
-    cols = start_col,
-    rows = start_row
-  )
-  openxlsx::addStyle(
-    wb,
-    sheet = sheet_name,
-    style = title_style,
-    cols = start_col,
-    rows = start_row + 1 + tot_row + 3
-  )
-  openxlsx::addStyle(
-    wb,
-    sheet = sheet_name,
-    style = title_style,
-    cols = start_col + tot_col + 1,
-    rows = start_row
-  )
+  openxlsx::addStyle(wb,
+                     sheet = sheet_name,
+                     style = title_style,
+                     cols = start_col,
+                     rows = start_row + 2)
+  openxlsx::addStyle(wb,
+                     sheet = sheet_name,
+                     style = title_style,
+                     cols = start_col,
+                     rows = start_row + 3 + tot_row + 3)
+  openxlsx::addStyle(wb,
+                     sheet = sheet_name,
+                     style = title_style,
+                     cols = start_col + tot_col + 1,
+                     rows = start_row + 2)
   
   # Headers
   openxlsx::addStyle(wb,
-    sheet = sheet_name,
-    style = header_center_style,
-    cols = (start_col + 1):(start_col + length(outcomes)),
-    rows = start_row + 1
-  )
-  openxlsx::addStyle(
-    wb,
-    sheet = sheet_name,
-    style = header_center_style,
-    cols = (start_col + 1):(start_col + length(outcomes)),
-    rows = start_row + 1 + tot_row + 3 + 2
-  )
-  openxlsx::addStyle(
-    wb,
-    sheet = sheet_name,
-    style = header_center_style,
-    cols = (start_col + tot_col + 2):(start_col + tot_col + 1 + wgt_col),
-    rows = start_row + 1
-  )
+                     sheet = sheet_name,
+                     style = header_center_style,
+                     cols = (start_col + 1):(start_col + length(outcomes)),
+                     rows = start_row + 3)
+  openxlsx::addStyle(wb,
+                     sheet = sheet_name,
+                     style = header_center_style,
+                     cols = (start_col + 1):(start_col + length(outcomes)),
+                     rows = start_row + 3 + tot_row + 3 + 2)
+  openxlsx::addStyle(wb,
+                     sheet = sheet_name,
+                     style = header_center_style,
+                     cols = (start_col + tot_col + 2):(start_col + tot_col + 1 + wgt_col),
+                     rows = start_row + 3)
   
   # Bodies
-  openxlsx::addStyle(
-    wb,
-    sheet = sheet_name,
-    style = body_rnd_style,
-    gridExpand = TRUE,
-    cols = (start_col + 1):(start_col + length(outcomes)),
-    rows = (start_row + 2):(start_row + tot_row + 1)
-  )
-  openxlsx::addStyle(
-    wb,
-    sheet = sheet_name,
-    style = body_idx_style,
-    gridExpand = TRUE,
-    cols = (start_col + 1):(start_col + length(outcomes)),
-    rows = (start_row + 1 + tot_row + 6):(start_row + tot_row + 6 + prio_row)
-  )
-  openxlsx::addStyle(
-    wb,
-    sheet = sheet_name,
-    style = body_pct_style,
-    gridExpand = TRUE,
-    cols = (start_col + tot_col + 2):(start_col + tot_col + 1 + wgt_col),
-    rows = (start_row + 2):(start_row + 2 + wgt_row)
-  )
+  openxlsx::addStyle(wb,
+                     sheet = sheet_name,
+                     style = body_rnd_style,
+                     gridExpand = TRUE,
+                     cols = (start_col + 1):(start_col + length(outcomes)),
+                     rows = (start_row + 4):(start_row + tot_row + 3))
+  openxlsx::addStyle(wb,
+                     sheet = sheet_name,
+                     style = body_idx_style,
+                     gridExpand = TRUE,
+                     cols = (start_col + 1):(start_col + length(outcomes)),
+                     rows = (start_row + 3 + tot_row + 6):(start_row + 2 + tot_row + 6 + prio_row))
+  openxlsx::addStyle(wb,
+                     sheet = sheet_name,
+                     style = body_pct_style,
+                     gridExpand = TRUE,
+                     cols = (start_col + tot_col + 2):(start_col + tot_col + 1 + wgt_col),
+                     rows = (start_row + 4):(start_row + 4 + wgt_row))
   
   
   # CONDITIONAL FORMATTING --------------------------------------------------
@@ -348,7 +361,7 @@ add_plssem_prioritization <- function(
     wb,
     sheet = sheet_name,
     cols = (start_col + tot_col + 2):(start_col + tot_col + 1 + wgt_col),
-    rows = (start_row + 2):(start_row + 2 + wgt_row),
+    rows = (start_row + 4):(start_row + 4 + wgt_row),
     type = "databar",
     style = "#638EC6",
     gradient = FALSE
@@ -358,18 +371,15 @@ add_plssem_prioritization <- function(
   # MISC --------------------------------------------------------------------
   
   # Expand column width of col B
-  openxlsx::setColWidths(
-    wb,
-    sheet = sheet_name,
-    cols = "B",
-    widths = 20
-  )
+  openxlsx::setColWidths(wb,
+                         sheet = sheet_name,
+                         cols = "B",
+                         widths = 20)
   
   # Hide gridlines
-  openxlsx::showGridLines(
-    wb,
-    sheet = sheet_name,
-    showGridLines = FALSE
-  )
+  openxlsx::showGridLines(wb,
+                          sheet = sheet_name,
+                          showGridLines = FALSE)
+  
   
 }

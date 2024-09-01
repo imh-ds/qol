@@ -14,7 +14,8 @@ apply_plssem_long_table_formatter <- function(
     df,
     start_col,
     start_row,
-    digits = 3) {
+    digits = 3
+) {
   
   # Define rows and columns
   mod_row <- nrow(df)

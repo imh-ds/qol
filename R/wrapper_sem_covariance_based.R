@@ -63,7 +63,7 @@
 #' https://doi.org/10.18637/jss.v048.i02
 #' 
 #' @export
-wrapper_cbsem <- function(
+wrap_cbsem <- function(
     data = .,
     model,
     cluster = NULL,
@@ -74,13 +74,15 @@ wrapper_cbsem <- function(
 ){
   
   # SEM Modeling
-  sem_mod = lavaan::sem(model,
-                        data = data,
-                        cluster = cluster,
-                        estimator = estimator,
-                        se = se,
-                        missing = missing,
-                        fixed.x = FALSE)
+  sem_mod <- lavaan::sem(
+    model,
+    data = data,
+    cluster = cluster,
+    estimator = estimator,
+    se = se,
+    missing = missing,
+    fixed.x = FALSE
+  )
   
   # Get Summary of SEM
   sem_sum <- lavaan::summary(sem_mod)
@@ -99,57 +101,76 @@ wrapper_cbsem <- function(
   sem_groups <- sem_sum[["data"]][["ngroups"]]
   
   # Extract goodness of fit names
-  names = rownames(lavaan::fitmeasures(sem_mod) %>%
+  names <- rownames(lavaan::fitmeasures(sem_mod) %>%
                      as.data.frame())
   
   # Get goodness of fit measures
-  fittab = lavaan::fitmeasures(sem_mod) %>% 
-    as.data.frame() %>% 
-    rename("Value" = ".") %>% 
-    rownames_to_column(var = "Metric")
+  fittab <- as.data.frame(
+    lavaan::fitmeasures(sem_mod)
+  )%>% 
+    dplyr::rename("Value" = ".") %>% 
+    tibble::rownames_to_column(var = "Metric")
   
   # Create goodness of fit table
-  fittext = lavaan::fitmeasures(sem_mod) %>% 
-    as.data.frame() %>% 
+  fittext <- as.data.frame(
+    lavaan::fitmeasures(sem_mod)
+  ) %>% 
     data.table::transpose() %>% 
     magrittr::set_colnames(names) %>% 
-    mutate(Value = paste0("(chi-sq(", df,
-                          ") = ", sprintf('%.3f', chisq),
-                          ", CFI = ", sprintf('%.3f', cfi),
-                          ", TLI = ", sprintf('%.3f', tli),
-                          ", SRMR = ", sprintf('%.3f', srmr),
-                          ", RSMEA = ", sprintf('%.3f', rmsea),
-                          ", 90% CI [", sprintf('%.3f', rmsea.ci.lower),
-                          ", ", sprintf('%.3f', rmsea.ci.upper),
-                          "])")) %>% 
+    dplyr::mutate(
+      Value = paste0("(chi-sq(", df,
+                     ") = ", sprintf('%.3f', chisq),
+                     ", CFI = ", sprintf('%.3f', cfi),
+                     ", TLI = ", sprintf('%.3f', tli),
+                     ", SRMR = ", sprintf('%.3f', srmr),
+                     ", RSMEA = ", sprintf('%.3f', rmsea),
+                     ", 90% CI [", sprintf('%.3f', rmsea.ci.lower),
+                     ", ", sprintf('%.3f', rmsea.ci.upper),
+                     "])")
+    ) %>% 
     dplyr::select(Value) %>% 
-    rownames_to_column(var = "Metric") %>% 
-    mutate(Metric = "Text")
+    tibble::rownames_to_column(var = "Metric") %>% 
+    dplyr::mutate(Metric = "Text")
   
   # Combine fit measures and fit text
-  fittab = fittab %>% 
-    rbind(fittext)
+  fittab <- rbind(fittab,
+                  fittext)
   
   # Get beta coefficient estimates
-  esttab = as.data.frame(standardizedsolution(sem_mod)) %>%
-    rename(Item = rhs) %>% 
-    mutate(text = paste0("(beta = ", sprintf('%.3f', est.std),
-                         ", se = ", sprintf('%.3f', se),
-                         ", z = ", sprintf('%.3f', z),
-                         ", 95% CI [", sprintf('%.3f', ci.lower),
-                         ", ", sprintf('%.3f', ci.upper),
-                         "], p ", ifelse(pvalue < .001, "< .001",
-                                         paste0("= ", sprintf('%.3f',pvalue))),
-                         ")"),
-           fig.text = paste0(sprintf('%.3f', est.std),
-                             ifelse(pvalue < .001, "***",
-                                    ifelse(pvalue > .001 & pvalue < .01, "**",
-                                           ifelse(pvalue > .01 & pvalue < .05, "*", ""))),
-                             " [", sprintf('%.3f', ci.lower),
-                             ", ", sprintf('%.3f', ci.upper),
-                             "]"),
-           path = paste0(Item, " -> ", lhs)) %>%
-    dplyr::select(path, lhs, op, Item, label, est.std, se, ci.lower, ci.upper, everything())
+  esttab <- as.data.frame(
+    lavaan::standardizedsolution(sem_mod)
+  ) %>%
+    dplyr::rename(Item = rhs) %>% 
+    dplyr::mutate(
+      text = paste0("(beta = ", sprintf('%.3f', est.std),
+                    ", se = ", sprintf('%.3f', se),
+                    ", z = ", sprintf('%.3f', z),
+                    ", 95% CI [", sprintf('%.3f', ci.lower),
+                    ", ", sprintf('%.3f', ci.upper),
+                    "], p ", ifelse(pvalue < .001, "< .001",
+                                    paste0("= ", sprintf('%.3f',pvalue))),
+                    ")"),
+      fig.text = paste0(sprintf('%.3f', est.std),
+                        ifelse(pvalue < .001, "***",
+                               ifelse(pvalue > .001 & pvalue < .01, "**",
+                                      ifelse(pvalue > .01 & pvalue < .05, "*", ""))),
+                        " [", sprintf('%.3f', ci.lower),
+                        ", ", sprintf('%.3f', ci.upper),
+                        "]"),
+      path = paste0(Item, " -> ", lhs)
+    ) %>%
+    dplyr::select(
+      path, 
+      lhs, 
+      op, 
+      Item, 
+      label, 
+      est.std, 
+      se, 
+      ci.lower, 
+      ci.upper, 
+      dplyr::everything()
+    )
   
   # Get measurement model loadings
   loadtab <- esttab %>% 

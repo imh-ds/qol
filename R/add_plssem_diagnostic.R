@@ -6,13 +6,11 @@
 #'
 #' @export
 add_plssem_diagnostic <- function(
-    
   wb,
   plssem_mod,
   sheet_name,
   name = NULL,
   digits = 3
-  
 ) {
   
   # Grab data frames
@@ -96,16 +94,25 @@ add_plssem_diagnostic <- function(
     sheet = sheet_name,
     x = if(!is.null(name)) {
       paste0(name,
-             " - ",
-             type,
-             " ANOVA")
+             " - PLS-SEM Model Diagnostics")
     } else {
-      paste0(type,
-             " ANOVA")
+      "PLS-SEM Model Diagnostics"
     },
     startCol = start_col,
     startRow = start_row
-  )  
+  )
+  
+  # Apply title format
+  openxlsx::addStyle(
+    wb = wb,
+    sheet = sheet_name,
+    style = openxlsx::createStyle(
+      fontSize = 20,
+      textDecoration = "bold"
+    ),
+    cols = start_col,
+    rows = start_row
+  )
   
 
   # WRITE MODEL COEFFICIENTS ------------------------------------------------
@@ -114,7 +121,7 @@ add_plssem_diagnostic <- function(
                       sheet = sheet_name,
                       x = "Model Coefficients",
                       startCol = start_col,
-                      startRow = start_row)
+                      startRow = start_row + 2)
   openxlsx::writeData(wb,
                       sheet = sheet_name,
                       x = model_e,
@@ -132,7 +139,7 @@ add_plssem_diagnostic <- function(
     sheet = sheet_name,
     df = model_e,
     start_col = start_col,
-    start_row = start_row,
+    start_row = start_row + 2,
     digits = digits
   )
   

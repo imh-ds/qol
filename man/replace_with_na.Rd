@@ -4,13 +4,13 @@
 \alias{replace_with_na}
 \title{Replace values with NA}
 \usage{
-replace_with_na(data = ., variables, values)
+replace_with_na(data = ., vars, values)
 }
 \arguments{
 \item{data}{A dataframe object. This should be a structured dataset where
 each column represents a variable and each row represents an observation.}
 
-\item{variables}{A required vector of column names representing their 
+\item{vars}{A required vector of column names representing their 
 manifest variables.}
 
 \item{values}{A required vector of numeric or string values to be replaced
@@ -29,10 +29,10 @@ Cook's (2023) \code{naniar} package.
 }
 \examples{
 replace_with_na(data,
-                variables = c("var1", "var2"),
+                vars = c("var1", "var2"),
                 values = c(99, 98))
 replace_with_na(data,
-                variables = c("educ"),
+                vars = c("educ"),
                 values = c("Unknown", "Prefer not to say"))
 
 }

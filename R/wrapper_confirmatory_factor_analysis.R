@@ -102,16 +102,39 @@ wrap_cfa <- function(
   
   
   # Get fit metrics
-  fit_metrics <- data.frame(lavaan::fitmeasures(cfa_model)) %>% 
-    magrittr::set_colnames(., mod_name) %>% 
+  fit_metrics <- data.frame(
+    lavaan::fitmeasures(cfa_model)
+  ) %>% 
+    
+    # Rename columns
+    magrittr::set_colnames(.,
+                           mod_name) %>% 
+    
+    # Create fit metric variable
     tibble::rownames_to_column(var = "fit_metric")
   
+  
   # Get fit metrics table
-  fit_df <- data.frame(t(fit_metrics)) %>% 
-    janitor::row_to_names(row_number = 1) %>%
-    dplyr::mutate(dplyr::across(.cols = dplyr::everything(),
-                                \(x) as.numeric(x))) %>% 
+  fit_df <- data.frame(
+    t(fit_metrics)
+  ) %>% 
+    
+    # Convert first row to column names
+    janitor::row_to_names(
+      row_number = 1
+    ) %>%
+    
+    # Transform all variables back to numeric
+    dplyr::mutate(
+      dplyr::across(
+        .cols = dplyr::everything(),
+        \(x) as.numeric(x)
+      )
+    ) %>% 
+    
+    # Create model variable
     tibble::rownames_to_column(var = "model")
+  
   
   # Rounding setting
   rnd <- paste0("%.",
@@ -195,7 +218,10 @@ wrap_cfa <- function(
   # Grab CFA standardized loadings if standardized == TRUE
   if(isTRUE(standardized)){
     
-    cfa_loadings <- data.frame(lavaan::standardizedsolution(cfa_model))
+    cfa_loadings <- data.frame(
+      lavaan::standardizedsolution(cfa_model)
+    )
+    
     cfa_estimates <- cfa_loadings %>% 
       dplyr::filter(op == "=~") %>% 
       dplyr::rename(est = est.std)
@@ -205,7 +231,10 @@ wrap_cfa <- function(
   # Grab CFA loadings if standardized == FALSE
   if(isFALSE(standardized)){
     
-    cfa_loadings <- data.frame(lavaan::parameterestimates(cfa_model))
+    cfa_loadings <- data.frame(
+      lavaan::parameterestimates(cfa_model)
+    )
+    
     cfa_estimates <- cfa_loadings %>% 
       dplyr::filter(op == "=~")
     
@@ -217,23 +246,34 @@ wrap_cfa <- function(
   
   
   # Apply the estimate calculation to each unique latent variable
-  cfa_estimates_list <- lapply(cfa_unique_latents,
-                               function(u) {
-                                 
-                                 calculate_cfa_est(u = u,
-                                                   estimates = cfa_estimates)
-                                 
-                               }
+  cfa_estimates_list <- lapply(
+    cfa_unique_latents,
+    function(u) {
+      
+      calculate_cfa_est(
+        u = u,
+        estimates = cfa_estimates
+      )
+      
+    }
   )
   
   
   # Reduce to estimates table
-  cfa_estimates_table <- purrr::reduce(cfa_estimates_list,
-                                       rbind) %>% 
-    dplyr::mutate(model = c(mod_name, 
-                            rep(NA, 
-                                nrow(.)-1))) %>% 
-    dplyr::select(model, dplyr::everything())
+  cfa_estimates_table <- purrr::reduce(
+    cfa_estimates_list,
+    rbind
+  ) %>% 
+    
+    dplyr::mutate(
+      model = c(mod_name, 
+                rep(NA, 
+                    nrow(.)-1))
+    ) %>% 
+    dplyr::select(
+      model, 
+      dplyr::everything()
+    )
   
   
 

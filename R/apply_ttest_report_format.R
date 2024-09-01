@@ -40,7 +40,7 @@ apply_ttest_report_format <- function(
     halign = "center"
   )
   header_variable_p_style <- openxlsx::createStyle(
-    textDecoration = "bold-italic",
+    textDecoration = c("bold", "italic"),
     border = "top-bottom",
     halign = "center"
   )

@@ -8,7 +8,7 @@
 #'   represents a variable and each row represents an observation.
 #' @param vars A required vector of column names representing their manifest
 #'   variables. For latent and composite variables that are comprised of
-#'   multiple indicators, use the \code{desc_wrapper()} function and specify a
+#'   multiple indicators, use the \code{wrap_desc()} function and specify a
 #'   named list of variables in the \code{varlist} argument.
 #' @param digits Number of decimal places for the correlation matrix. Default is
 #'   3 decimal points. If not specified, the function will use the default

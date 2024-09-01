@@ -7,13 +7,63 @@
 #'
 #' @param data A dataframe object. This should be a structured dataset where
 #'   each column represents a variable and each row represents an observation.
-#' @param varlist An optional named list of vectors. Each name in the list
-#'   represents a composite or latent variable, and the corresponding vector
+#' @param composite_list A required \code{composite_list} object. Each name in
+#'   the list represents a composite variable, and the corresponding vector
 #'   contains the column names that are associated with the indicators
-#'   comprising said composite or latent variable. Default is NULL.
-#' @param digits Number of decimal places for the correlation matrix. Default is
-#'   3 decimal points. If not specified, the function will use the default
-#'   value.
+#'   comprising said composite variable.
+#' @param weight The weighting schema to use in calculating composite scores.
+#'   For a weighting schema within the Covariance Family, set \code{weight} to
+#'   \code{"average"} for unweighted, \code{"correlation"} for
+#'   correlation-weighted, and \code{"regression"} for regression-weighted. For
+#'   a weighting schema within the Standard Deviation (SD) Family, set
+#'   \code{weight} to \code{"sd_upweight"} to upweight SDs and
+#'   \code{"sd_downweight"} to downweight SDs. For a weighting schema within the
+#'   Median Family, set \code{weight} to \code{"median"} to calculate the
+#'   composite score as the median score, \code{"median_decay"} for
+#'   distance-to-median weighting with the decay function, and
+#'   \code{"median_gauss"} for distance-to-median weighting with the gaussian
+#'   function.
+#' @param digits The decimal places for the metrics to be rounded to. Default is
+#'   3. This argument is only relevant if \code{return_metrics = TRUE}.
+#' @param decay_rate A numeric value reflecting the decay rate (i.e.,
+#'   sensitivity) of the distance-to-median weighting schema. The default value
+#'   is set to 0.5. This argument is only relevant if \code{weight =
+#'   "median_decay"}.
+#' @param sigma A numeric value reflecting the sigma value for the Gaussian
+#'   function in the distance-to-median weighting schema. The default value is
+#'   set to 0.5. This argument is only relevant if \code{weight =
+#'   "median_gauss"}.
+#' @param entropy A string value reflecting the mutual information entropy
+#'   estimator from the \code{infotheo} package. Four estimators are available:
+#'   \code{emp} to compute the entropy of the empirical probability
+#'   distribution. Empirical entropy is suitable for simple calculations without
+#'   corrections. \code{mm} applies an asymptotic bias-corrected estimator
+#'   making it suitable for small sample sizes. \code{shrink} applies a
+#'   shrinkage estimate of the Dirichlet probability distribution to provide a
+#'   stable estimate useful for small sample sizes or sparse data. \code{sg}
+#'   applies a Schurmann-Grassberger estimate of the Dirichlet probability
+#'   distribution to serve as an alternative to the Shrinkage approach.
+#' @param nmi_method A string value reflecting the method used for calculating
+#'   Normalized Mutual Information (NMI) values. \code{"average"} will normalize
+#'   MI values using the average entropies of variables A and B.
+#'   \code{"geometric"} will normalize MI values using the geometric mean of
+#'   entropies of variables A and B.
+#' @param return_metrics Logic to determine whether to return reliability and
+#'   validity metrics. Set to \code{TRUE} for a list of dataframes with
+#'   reliability and validity metrics.
+#' @param type A string value indicating the type of correlations to compute.
+#'   Specify \code{type = "pearson"} to compute Pearson's r correlation
+#'   (default). Specify \code{"spearman"} to compute Spearman's correlation.
+#' @param p_thresholds A vector of length 3 indicating the p-value thresholds
+#'   for \code{*}, \code{**}, and \code{***} stars.
+#' @param p_stars A logical indicating whether to have p-value stars
+#'   (\code{TRUE}) or not (\code{FALSE}).
+#' @param msd_position A string value indicating whether to have the M and SD of
+#'   the variables on the left (\code{"left"}) or bottom of the correlation
+#'   matrix (\code{"bottom"}).
+#' @param name An optional string denoting the name of the study/analysis.
+#'
+#' @importFrom magrittr %>%
 #'
 #' @returns A list of dataframes containing the general descriptives of all
 #'   variables in the dataset from \code{psych::describe()} and variable
@@ -46,18 +96,21 @@
 #'   \url{https://stefaneng.github.io/apa_correlation_table/}.
 #'
 #' @export
-desc_wrapper <- function(
+wrap_desc <- function(
     data = .,
     composite_list = NULL,
     weight = "correlation",
     decay_rate = 0.5,
     sigma = 0.5,
+    entropy = "emp",
+    nmi_method = "geometric",
     return_metrics = TRUE,
     digits = 3,
     type = "pearson",
     p_thresholds = c(0.05, 0.01, 0.001),
     p_stars = TRUE,
-    msd_position = "left"
+    msd_position = "left",
+    name = NULL
 ){
   
   # If composite list is given, then get reliability metrics for each composite
@@ -106,12 +159,16 @@ desc_wrapper <- function(
   
 
   # Descriptive for data
-  data_desc <- data.frame(psych::describe(data)) %>% 
+  data_desc <- data.frame(
+    psych::describe(data)
+  ) %>% 
     tibble::rownames_to_column(var = "variable")
   
   # Data missingness
   data_missing <- data %>%
-    dplyr::summarise_all(list(~sum(is.na(.))/nrow(data))) %>%
+    dplyr::summarise_all(
+      list(~sum(is.na(.))/nrow(data))
+    ) %>%
     tidyr::gather(key = "variable",
                   value = "missingness") %>% 
     dplyr::mutate(n_total = nrow(data),
