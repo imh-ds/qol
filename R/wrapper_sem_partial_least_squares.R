@@ -101,6 +101,7 @@ wrap_plssem <- function(
     prioritization_weight_type = "combo",
     prioritization_cor_method = "pearson",
     study_name = NULL,
+    path_tables = c("long", "wide"),
     filename = NULL
 ) {
   

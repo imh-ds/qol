@@ -21,6 +21,7 @@ wrap_plssem(
   prioritization_weight_type = "combo",
   prioritization_cor_method = "pearson",
   study_name = NULL,
+  path_tables = c("long", "wide"),
   filename = NULL
 )
 
@@ -40,6 +41,7 @@ plssem(
   prioritization_weight_type = "combo",
   prioritization_cor_method = "pearson",
   study_name = NULL,
+  path_tables = c("long", "wide"),
   filename = NULL
 )
 }
@@ -102,13 +104,13 @@ Spearman's rank correlation. The default is \code{"pearson"}.}
 \item{study_name}{An optional character string indicating the name of the
 study.}
 
-\item{filename}{Location to save output file as excel workbook if specified.}
-
 \item{path_tables}{A vector of strings indicating which direct effects
 pathway table to export. Options include \code{"long"} for long-formatted
 regression tables with confidence intervals below the coefficients,
 \code{"wide"} for wide-formatted regression tables with confidence
 intervals adjacent to the coefficients, or \code{NULL} to not export any.}
+
+\item{filename}{Location to save output file as excel workbook if specified.}
 }
 \description{
 A wrapper function to automate PLS-SEM and extracting its
