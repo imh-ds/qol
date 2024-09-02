@@ -48,7 +48,14 @@
 #'   Options include \code{"pearson"} for Pearson's correlation,
 #'   \code{"kendall"} for Kendall rank correlation, and \code{"spearman"} for
 #'   Spearman's rank correlation. The default is \code{"pearson"}.
-#' @param file Location to save output file as excel workbook if specified.
+#' @param study_name An optional character string indicating the name of the
+#'   study.
+#' @param path_tables A vector of strings indicating which direct effects
+#'   pathway table to export. Options include \code{"long"} for long-formatted
+#'   regression tables with confidence intervals below the coefficients,
+#'   \code{"wide"} for wide-formatted regression tables with confidence
+#'   intervals adjacent to the coefficients, or \code{NULL} to not export any.
+#' @param filename Location to save output file as excel workbook if specified.
 #'
 #' @examples
 #' measurements <- constructs(
@@ -92,7 +99,9 @@ wrap_plssem <- function(
     prioritization = FALSE,
     prioritization_type = "combo",
     prioritization_weight_type = "combo",
-    prioritization_cor_method = "pearson"
+    prioritization_cor_method = "pearson",
+    study_name = NULL,
+    filename = NULL
 ) {
   
 
@@ -874,9 +883,28 @@ wrap_plssem <- function(
   
   # Save to results
   pls_sheets[["meta_data"]] <- meta_data
+
+  
+  # WRITE WORKBOOK ----------------------------------------------------------
+
+  if (!is.null(filename)) {
+    
+    write_plssem_workbook(
+      plssem_object = pls_sheets,
+      filename = filename,
+      study_name = study_name,
+      digits = digits,
+      path_tables = path_tables
+    )
+    
+  }
   
   
   # Return
   return(pls_sheets)
   
 }
+
+#' @rdname wrap_plssem
+#' @export
+plssem <- wrap_plssem

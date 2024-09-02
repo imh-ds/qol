@@ -4,21 +4,24 @@
 #' @param sheet_name 
 #' @param anova_object 
 #' @param name 
-#' @param digits 
+#' @param digits A numeric value indicating the number of digits to round to.
+#' @param report_es A vector of strings indicating which effect sizes to report.
+#'   Options include \code{"ges"} for generalized eta-squared, \code{"etaSq"}
+#'   for eta-squared, \code{"etaSqP"} for partial eta-squared, \code{"omegaSq"}
+#'   for omega-squared, and \code{"cohen_f"} for Cohen's f. Specify \code{NULL}
+#'   to not report any effect size.
 #'
 #' @return
 #' @export
 #'
 #' @examples
 add_anova_report <- function(
-    
   wb,
   sheet_name,
   anova_object,
   name = NULL,
   digits = 3,
-  report_es
-  
+  report_es = c("etaSqP")
 ) {
   
   

@@ -7,7 +7,13 @@
 #' @param assumptions A logical indicating whether to add an t-test assumptions
 #'   sheet. The default is \code{FALSE}.
 #' @param digits A numeric value indicating the number of digits to round to.
-#' @param report_variance A string indicating w
+#' @param report_variance A string indicating which variance statistic to
+#'   report. Options include \code{"sd"} for standard deviation and \code{"se"}
+#'   for standard error. The default is \code{"sd"}.
+#' @param report_test A string logical indicating which t-test to include in the
+#'   report. Options include \code{"student"} for Student's t-test,
+#'   \code{"welch"} for Welch's t-test, and \code{"wilcoxon"} for Wilcoxon
+#'   rank-sum test (i.e., Mann-Whitney U test). The default is \code{"welch"}.
 #'
 #' @export
 write_ttest <- function(

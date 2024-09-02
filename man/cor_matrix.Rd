@@ -37,11 +37,6 @@ Create a correlation matrix with variable mean and standard
   deviation descriptive statistics. The 'engine' of the correlation matrix is
   inspired from Stefan Engineering's code (Stefan Engineering, 2018).
 }
-\examples{
-variables <- c("age", "education", "income")
-cor_matrix(data = data, variables = variables, digits = 3)
-
-}
 \references{
 Stefan Engineering (2018). Create an APA style correlation table
   with R. \url{https://stefaneng.github.io/apa_correlation_table/}.

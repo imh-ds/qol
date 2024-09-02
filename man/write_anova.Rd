@@ -23,9 +23,20 @@ write_anova(
 study.}
 
 \item{assumptions}{A logical indicating whether to add an ANOVA assumptions
-sheet. The default is FALSE.}
+sheet. The default is \code{FALSE}.}
 
 \item{digits}{A numeric value indicating the number of digits to round to.}
+
+\item{summary_type}{A numeric value indicating the format of the ANOVA
+summary page in the workbook. \code{summary_type = 1} combines the between
+and within-subjects ANOVA summaries together. \code{summary_type = 2} keeps
+the between and within-subjects ANOVA summaries separate.}
+
+\item{report_es}{A vector of strings indicating which effect sizes to report.
+Options include \code{"ges"} for generalized eta-squared, \code{"etaSq"}
+for eta-squared, \code{"etaSqP"} for partial eta-squared, \code{"omegaSq"}
+for omega-squared, and \code{"cohen_f"} for Cohen's f. Specify \code{NULL}
+to not report any effect size.}
 }
 \description{
 Write ANOVA Report Workbook

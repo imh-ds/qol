@@ -18,16 +18,11 @@
 #'   deviation. The dataframe can be exported as an excel workbook to be copy
 #'   and pasted into a word document or LaTeX.
 #'
-#' @examples
-#' variables <- c("age", "education", "income")
-#' cor_matrix(data = data, variables = variables, digits = 3)
-#'
 #' @references Stefan Engineering (2018). Create an APA style correlation table
 #'   with R. \url{https://stefaneng.github.io/apa_correlation_table/}.
 #'
 #' @export
 cor_matrix <- function(
-    
   data = .,
   vars = NULL,
   digits = 3,
@@ -35,7 +30,6 @@ cor_matrix <- function(
   p_thresholds = c(0.05, 0.01, 0.001),
   p_stars = TRUE,
   msd_position = "left"
-  
 ){
   
   # If vars is specified

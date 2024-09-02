@@ -12,7 +12,12 @@ wrap_ttest(
   alternative = "two.sided",
   conf_level = 0.95,
   digits = 3,
-  es_type = "hedges"
+  es_type = "hedges",
+  filename = NULL,
+  study_name = NULL,
+  assumptions = FALSE,
+  report_variance = "sd",
+  report_test = "welch"
 )
 }
 \arguments{
@@ -43,10 +48,33 @@ value.}
 \item{es_type}{Character indicating which effect size to return. Options
 include \code{"cohen"} for Cohen's d, \code{"hedges"} for Hedges' g, or
 \code{"glass"} for Glass's delta. The default is Hedges' g.}
+
+\item{filename}{Location to save output file as excel workbook if specified.}
+
+\item{study_name}{Relevant only if \code{filename} is specified. An optional
+character string indicating the name of the study.}
+
+\item{assumptions}{Relevant only if \code{filename} is specified. A logical
+indicating whether to add an t-test assumptions sheet. The default is
+\code{FALSE}.}
+
+\item{report_variance}{Relevant only if \code{filename} is specified. A
+string indicating which variance statistic to report. Options include
+\code{"sd"} for standard deviation and \code{"se"} for standard error. The
+default is \code{"sd"}.}
+
+\item{report_test}{Relevant only if \code{filename} is specified. A string
+logical indicating which t-test to include in the report. Options include
+\code{"student"} for Student's t-test, \code{"welch"} for Welch's t-test,
+and \code{"wilcoxon"} for Wilcoxon rank-sum test (i.e., Mann-Whitney U
+test). The default is \code{"welch"}.}
 }
 \description{
 A wrapper function to automate running and extracting the
-  results of independent samples t-tests. The current function is limited to
-  running Student's, Welch's, and Wilcoxon/Mann-Whitney U tests. Binary group
-  effect sizes are limited to Cohen's d, Hedges' g, and Glass's delta.
+  results of independent samples t-tests.
+}
+\details{
+The current function is limited to running Student's, Welch's, and
+  Wilcoxon/Mann-Whitney U tests. Binary group effect sizes are limited to
+  Cohen's d, Hedges' g, and Glass's delta.
 }

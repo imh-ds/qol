@@ -2,6 +2,7 @@
 % Please edit documentation in R/wrapper_sem_partial_least_squares.R
 \name{wrap_plssem}
 \alias{wrap_plssem}
+\alias{plssem}
 \title{Partial Least Squares Structural Equation Modeling Wrapper}
 \usage{
 wrap_plssem(
@@ -18,7 +19,28 @@ wrap_plssem(
   prioritization = FALSE,
   prioritization_type = "combo",
   prioritization_weight_type = "combo",
-  prioritization_cor_method = "pearson"
+  prioritization_cor_method = "pearson",
+  study_name = NULL,
+  filename = NULL
+)
+
+plssem(
+  data = .,
+  measurements,
+  structure,
+  bootn = 1000,
+  inner_weights = seminr::path_weighting,
+  missing = seminr::mean_replacement,
+  missing_value = NA,
+  max_iter = 300,
+  stop_criterion = 7,
+  digits = 3,
+  prioritization = FALSE,
+  prioritization_type = "combo",
+  prioritization_weight_type = "combo",
+  prioritization_cor_method = "pearson",
+  study_name = NULL,
+  filename = NULL
 )
 }
 \arguments{
@@ -77,7 +99,16 @@ Options include \code{"pearson"} for Pearson's correlation,
 \code{"kendall"} for Kendall rank correlation, and \code{"spearman"} for
 Spearman's rank correlation. The default is \code{"pearson"}.}
 
-\item{file}{Location to save output file as excel workbook if specified.}
+\item{study_name}{An optional character string indicating the name of the
+study.}
+
+\item{filename}{Location to save output file as excel workbook if specified.}
+
+\item{path_tables}{A vector of strings indicating which direct effects
+pathway table to export. Options include \code{"long"} for long-formatted
+regression tables with confidence intervals below the coefficients,
+\code{"wide"} for wide-formatted regression tables with confidence
+intervals adjacent to the coefficients, or \code{NULL} to not export any.}
 }
 \description{
 A wrapper function to automate PLS-SEM and extracting its
