@@ -96,7 +96,7 @@ wrap_multi_cfa <- function(
     mod_name <- names(models)[[m]]
     
     # Run CFA Wrapper by model
-    cfa_result <- cfa_wrapper(
+    cfa_result <- wrap_cfa(
       
       data = data,
       model = mod,
