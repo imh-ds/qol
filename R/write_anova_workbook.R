@@ -25,7 +25,7 @@ write_anova <- function(
   assumptions = FALSE,
   digits = 3,
   summary_type = 1,
-  report_es = NULL
+  report_es = "etaSqP"
 ) {
   
   # Create wb

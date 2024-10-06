@@ -50,11 +50,16 @@ add_anova_report <- function(
   es_length <- length(report_es)
   
   # Get correction type
-  correction_type <- dplyr::case_when(
-    anova_object[["meta_data"]][["correction"]] == "HF" ~ "Huynh-Feldt",
-    anova_object[["meta_data"]][["correction"]] == "GG" ~ "Greenhouse-Geisser",
-    anova_object[["meta_data"]][["correction"]] == "none" ~ NA,
-  )
+  if (anova_object[["meta_data"]][["anova_type"]] %in% c("Mixed Model",
+                                                         "Repeated Measures")) {
+    correction_type <- dplyr::case_when(
+      anova_object[["meta_data"]][["correction"]] == "HF" ~ "Huynh-Feldt",
+      anova_object[["meta_data"]][["correction"]] == "GG" ~ "Greenhouse-Geisser",
+      anova_object[["meta_data"]][["correction"]] == "none" ~ NA,
+    )
+  } else {
+    correction_type <- NULL
+  }
   
   # Get length of WS & BS vars
   eff_length <- anova_object[["emm"]] %>% 
@@ -91,8 +96,6 @@ add_anova_report <- function(
     )
   
   # If anova object is RM, combine BS and WS summaries
-  if (anova_object[["meta_data"]][["anova_type"]] %in% c("Mixed Model",
-                                                         "Repeated Measures")) {
     
     # Summaries
     ws_sum <- anova_object[["ws_summary"]]
@@ -106,7 +109,7 @@ add_anova_report <- function(
       dplyr::rename(effect = name) %>% 
       
       # Replace interaction symbol
-      dplyr::mutate(effect = gsub(":", "*", effect)) %>% 
+      dplyr::mutate(effect = gsub(":", " \u00D7 ", effect)) %>% 
       
       # Remove residual information
       dplyr::filter(!effect == "Residual") %>% 
@@ -115,10 +118,12 @@ add_anova_report <- function(
       dplyr::select(names(.)[1:6],
                     dplyr::all_of(report_es))
     
-  }
   
   # Combine into a report table
   report_df <- emm %>% 
+    
+    # Replace interaction symbol
+    dplyr::mutate(effect = gsub("\\*", " \u00D7 ", effect)) %>% 
     
     # Join with summary
     dplyr::full_join(
@@ -229,7 +234,7 @@ add_anova_report <- function(
   openxlsx::writeData(
     wb = wb,
     sheet = sheet_name,
-    x = if (!is.na(correction_type)) {
+    x = if (!is.null(correction_type)) {
       paste0(
         "NOTE: Running ",
         correction_type,

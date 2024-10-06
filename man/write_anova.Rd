@@ -11,7 +11,7 @@ write_anova(
   assumptions = FALSE,
   digits = 3,
   summary_type = 1,
-  report_es = NULL
+  report_es = "etaSqP"
 )
 }
 \arguments{
