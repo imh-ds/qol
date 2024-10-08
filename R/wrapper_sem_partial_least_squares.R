@@ -343,7 +343,7 @@ wrap_plssem <- function(
     dplyr::filter(
       
       # Remove interaction effects
-      !stringr::str_detect(variable, fixed("*")),
+      !stringr::str_detect(variable, stringr::fixed("*")),
       
       # Remove lower-order constructs
       base::sapply(c(predictors,
