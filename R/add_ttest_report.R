@@ -48,6 +48,130 @@ add_ttest_report <- function(
   # Get names of effect size
   desc <- ttest_object[["descriptive"]]
   
+  # Generate t-test report
+  report_df <- generate_ttest_report(
+    ttest_object = ttest_object,
+    report_variance = report_variance,
+    report_test = report_test
+  )
+
+  
+  # TABLE PARAMETERS --------------------------------------------------------
+  
+  rep_row <- nrow(report_df)
+  rep_col <- ncol(report_df)
+  
+  
+  # WRITE DATA --------------------------------------------------------------
+  
+  # -- SUMMARY & TITLE -- #
+  openxlsx::writeData(
+    wb = wb,
+    sheet = sheet_name,
+    x = if(!is.null(name)) {
+      paste0(name,
+             " - Independent Samples T-Test Report")
+    } else {
+      "Independent Samples T-Test Report"
+    },
+    startCol = start_col,
+    startRow = start_row
+  )
+  
+  
+  # Title
+  openxlsx::writeData(
+    wb = wb,
+    sheet = sheet_name,
+    x = "Reportable Table",
+    startCol = start_col,
+    startRow = start_row + 2
+  )
+  openxlsx::writeData(
+    wb = wb,
+    sheet = sheet_name,
+    x = report_df,
+    startCol = start_col,
+    startRow = start_row + 3
+  )
+  
+  
+  # Write Note
+  openxlsx::writeData(
+    wb = wb,
+    sheet = sheet_name,
+    x = paste0(
+      "NOTE: Running ",
+      ttest_type,
+      " test; Effect size is ",
+      es_stat,
+      "."
+    ),
+    startCol = start_col,
+    startRow = start_row + 3 + rep_row + 1
+  )
+  
+  
+  # APPLY FORMATTING --------------------------------------------------------
+  
+  # Apply title format
+  openxlsx::addStyle(
+    wb = wb,
+    sheet = sheet_name,
+    style = openxlsx::createStyle(
+      fontSize = 20,
+      textDecoration = "bold"
+    ),
+    cols = start_col,
+    rows = start_row
+  )
+  
+  # Apply format
+  apply_ttest_report_format(
+    wb = wb,
+    sheet = sheet_name,
+    mod_row = rep_row,
+    mod_col = rep_col,
+    start_col = start_col,
+    start_row = start_row + 2,
+    digits = digits
+  )
+  
+  # Expand column width of col B
+  openxlsx::setColWidths(wb,
+                         sheet = sheet_name,
+                         cols = "B",
+                         widths = 15)
+  
+  # Hide gridlines
+  openxlsx::showGridLines(wb,
+                          sheet = sheet_name,
+                          showGridLines = FALSE)
+  
+}
+
+
+#' Generate T-Test Reportable Table Sheet
+#'
+#' @param ttest_object The t-test object from \code{wrap_ttest}.
+#' @param report_variance A string value or vector of strings indicating which
+#'   variance measure to report. Options include \code{"sd"} for standard
+#'   deviation, \code{"se"} for standard error, or \code{c("sd", "se")} for
+#'   both. The default is standard deviation \code{"sd"}.
+#' @param report_test A string value indicating which t-test statistic to
+#'   report. Options include \code{"student"} for Student's t-test,
+#'   \code{"welch"} for Welch's t-test, and \code{"wilcox"} for Wilcoxon
+#'   Rank-Sum W test / Mann-Whitney U test. The default is \code{"welch"}.
+#'
+generate_ttest_report <- function(
+    ttest_object,
+    report_variance = "sd",
+    report_test = "welch"
+) {
+  
+  # Get names of effect size
+  desc <- ttest_object[["descriptive"]]
+  
   
   # t-test type
   ttest_type <- dplyr::case_when(
@@ -145,97 +269,7 @@ add_ttest_report <- function(
       !!rlang::sym(es_name) := es
     )
   
-  
-  # TABLE PARAMETERS --------------------------------------------------------
-  
-  rep_row <- nrow(report_df)
-  rep_col <- ncol(report_df)
-  
-  
-  # WRITE DATA --------------------------------------------------------------
-  
-  # -- SUMMARY & TITLE -- #
-  openxlsx::writeData(
-    wb = wb,
-    sheet = sheet_name,
-    x = if(!is.null(name)) {
-      paste0(name,
-             " - Independent Samples T-Test Report")
-    } else {
-      "Independent Samples T-Test Report"
-    },
-    startCol = start_col,
-    startRow = start_row
-  )
-  
-  
-  # Title
-  openxlsx::writeData(
-    wb = wb,
-    sheet = sheet_name,
-    x = "Reportable Table",
-    startCol = start_col,
-    startRow = start_row + 2
-  )
-  openxlsx::writeData(
-    wb = wb,
-    sheet = sheet_name,
-    x = report_df,
-    startCol = start_col,
-    startRow = start_row + 3
-  )
-  
-  
-  # Write Note
-  openxlsx::writeData(
-    wb = wb,
-    sheet = sheet_name,
-    x = paste0(
-      "NOTE: Running ",
-      ttest_type,
-      " test; Effect size is ",
-      es_stat,
-      "."
-    ),
-    startCol = start_col,
-    startRow = start_row + 3 + rep_row + 1
-  )
-  
-  
-  # APPLY FORMATTING --------------------------------------------------------
-  
-  # Apply title format
-  openxlsx::addStyle(
-    wb = wb,
-    sheet = sheet_name,
-    style = openxlsx::createStyle(
-      fontSize = 20,
-      textDecoration = "bold"
-    ),
-    cols = start_col,
-    rows = start_row
-  )
-  
-  # Apply format
-  apply_ttest_report_format(
-    wb = wb,
-    sheet = sheet_name,
-    mod_row = rep_row,
-    mod_col = rep_col,
-    start_col = start_col,
-    start_row = start_row + 2,
-    digits = digits
-  )
-  
-  # Expand column width of col B
-  openxlsx::setColWidths(wb,
-                         sheet = sheet_name,
-                         cols = "B",
-                         widths = 15)
-  
-  # Hide gridlines
-  openxlsx::showGridLines(wb,
-                          sheet = sheet_name,
-                          showGridLines = FALSE)
+  # Return
+  return(report_df)
   
 }
