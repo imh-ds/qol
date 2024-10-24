@@ -30,7 +30,7 @@ generate_plssem_table_long <- function(
       
       pt_est <- pt_outcome %>% 
         dplyr::mutate(std_est = paste(sprintf(rnd, boot_est),
-                                      case_when(
+                                      dplyr::case_when(
                                         
                                         p > .05 ~ "",
                                         p < .05 & p > .01 ~ "*",
@@ -80,7 +80,7 @@ generate_plssem_table_long <- function(
         cbind(pt_df1) %>% 
         rbind(pt_df3) %>% 
         rbind(pt_df4) %>% 
-        dplyr::rename(!!sym(var) := est)
+        dplyr::rename(!!rlang::sym(var) := est)
       
       return(pt_table)
       
