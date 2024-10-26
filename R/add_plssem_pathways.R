@@ -14,71 +14,20 @@ add_plssem_pathways <- function(
   digits = 3
 ) {
   
-  # Set parameter for rounding
-  rnd <- paste0('%.',
-                digits,
-                "f")
-  
   # Detect whether indirect effects are in the PLS-SEM
   # If so, combine into one pathway model. Otherwise, only extract direct effects.
   if (isTRUE(plssem_mod[["meta_data"]][["indirect_effects"]])) {
     
     # Get both direct & indirect pathway effects
-    direct_effs <- plssem_mod[["Direct_Effects"]] %>% 
+    direct_effs <- generate_plssem_pathtext(
+      plssem_mod[["Direct_Effects"]],
+      digits = digits
+    )
       
-      # Generate texts
-      dplyr::mutate(
-        in_text = paste("(\u03B2 = ",
-                        sprintf(rnd,
-                                boot_est),
-                        ", SE = ", base::sprintf(rnd, boot_se),
-                        ", z = ", sprintf(rnd,z),
-                        ", 95% CI [", sprintf(rnd,lower_ci),
-                        ", ", sprintf(rnd,upper_ci),
-                        "], p ", ifelse(p < 0.001, "< 0.001", paste("=", sprintf(rnd,p))),")",
-                        sep = ""),
-        fig_text = paste(sprintf(rnd, boot_est),
-                         case_when(
-                           
-                           p > .05 ~ "",
-                           p < .05 & p > .01 ~ "*",
-                           p < .01 & p > .001 ~ "**",
-                           p < .001 ~ "***"
-                           
-                         ),
-                         " [", sprintf(rnd,lower_ci),
-                         ", ", sprintf(rnd,upper_ci),
-                         "]",
-                         sep = "")
-      )
-      
-    indirect_effs <- plssem_mod[["Indirect_Effects"]] %>% 
-      
-      # Generate texts
-      dplyr::mutate(
-        in_text = paste("(\u03B2 = ",
-                        sprintf(rnd,
-                                boot_est),
-                        ", SE = ", base::sprintf(rnd, boot_se),
-                        ", z = ", sprintf(rnd,z),
-                        ", 95% CI [", sprintf(rnd,lower_ci),
-                        ", ", sprintf(rnd,upper_ci),
-                        "], p ", ifelse(p < 0.001, "< 0.001", paste("=", sprintf(rnd, p))),")",
-                        sep = ""),
-        fig_text = paste(sprintf(rnd, boot_est),
-                         dplyr::case_when(
-                           
-                           p > .05 ~ "",
-                           p < .05 & p > .01 ~ "*",
-                           p < .01 & p > .001 ~ "**",
-                           p < .001 ~ "***"
-                           
-                         ),
-                         " [", sprintf(rnd, lower_ci),
-                         ", ", sprintf(rnd, upper_ci),
-                         "]",
-                         sep = "")
-      )
+    indirect_effs <- generate_plssem_pathtext(
+      plssem_mod[["Indirect_Effects"]],
+      digits = digits
+    )
     
     # Get nrow lengths for formatting later
     de_row <- nrow(direct_effs)
@@ -118,33 +67,10 @@ add_plssem_pathways <- function(
   } else {
     
     # Get direct pathway effects
-    effects <- plssem_mod[["Direct_Effects"]] %>% 
-      
-      # Generate texts
-      dplyr::mutate(
-        in_text = paste("(\u03B2 = ",
-                        sprintf(rnd,
-                                boot_est),
-                        ", SE = ", base::sprintf(rnd, boot_se),
-                        ", z = ", sprintf(rnd, z),
-                        ", 95% CI [", sprintf(rnd, lower_ci),
-                        ", ", sprintf(rnd, upper_ci),
-                        "], p ", ifelse(p < 0.001, "< 0.001", paste("=", sprintf(rnd, p))),")",
-                        sep = ""),
-        fig_text = paste(sprintf(rnd, boot_est),
-                         dplyr::case_when(
-                           
-                           p > .05 ~ "",
-                           p < .05 & p > .01 ~ "*",
-                           p < .01 & p > .001 ~ "**",
-                           p < .001 ~ "***"
-                           
-                         ),
-                         " [", sprintf(rnd, lower_ci),
-                         ", ", sprintf(rnd, upper_ci),
-                         "]",
-                         sep = "")
-      )
+    effects <- generate_plssem_pathtext(
+      plssem_mod[["Direct_Effects"]],
+      digits = digits
+    )
     
   }
   
