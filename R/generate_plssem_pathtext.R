@@ -19,7 +19,7 @@ generate_plssem_pathtext <- function(
     
     # Generate texts
     dplyr::mutate(
-      in_text = paste(if(isTRUE(latex)){"($\beta$ = "} else {"(\u03B2 = "},
+      in_text = paste(if(isTRUE(latex)){"($\\beta$ = "} else {"(\u03B2 = "},
                       sprintf(rnd,
                               boot_est),
                       ", SE = ", base::sprintf(rnd, boot_se),
