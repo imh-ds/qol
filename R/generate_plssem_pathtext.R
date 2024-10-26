@@ -8,12 +8,13 @@ generate_plssem_pathtext <- function(
     digits = 3
 ) {
   
+  # Set parameter for rounding
+  rnd <- paste0('%.',
+                digits,
+                "f")
+  
+  # Generate texts
   text_effects <- plssem_mod_effects |> 
-    
-    # Set parameter for rounding
-    rnd <- paste0('%.',
-                  digits,
-                  "f")
     
     # Generate texts
     dplyr::mutate(
